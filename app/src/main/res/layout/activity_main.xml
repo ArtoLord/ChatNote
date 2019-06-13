@@ -99,7 +99,7 @@
 
                 android:background="#00FFFFFF"
 
-                android:src="@drawable/ic_send_teal_500_36dp"
+                android:src="@drawable/ic_send_amber_800_36dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
