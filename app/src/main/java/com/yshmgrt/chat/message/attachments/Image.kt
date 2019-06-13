@@ -11,7 +11,7 @@ import android.widget.LinearLayout
 import com.yshmgrt.chat.R
 import kotlinx.android.synthetic.main.image_attachment.view.*
 
-class Image:LinearLayout,Attachment{
+class Image:LinearLayout{
     @JvmOverloads
     constructor(
         context: Context,
@@ -30,11 +30,7 @@ class Image:LinearLayout,Attachment{
         LayoutInflater.from(context)
             .inflate(R.layout.image_attachment, this, true)
     }
-    fun setImage(drawable: Drawable){
+    fun setImage(drawable: Drawable?){
         source.setImageDrawable(drawable)
     }
-    override fun getView(): View {
-        return this
-    }
-
 }

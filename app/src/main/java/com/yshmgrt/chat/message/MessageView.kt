@@ -3,9 +3,9 @@ package com.yshmgrt.chat.message
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.LinearLayout
 import com.yshmgrt.chat.R
-import com.yshmgrt.chat.message.attachments.Attachment
 import kotlinx.android.synthetic.main.message_view.view.*
 
 class MessageView @JvmOverloads constructor(
@@ -29,7 +29,7 @@ class MessageView @JvmOverloads constructor(
             teg_field.addView(tag)
         }
     }
-    fun addAttachments(attachment: Array<Attachment>){
-        for(i in attachment) attachments.addView(i.getView())
+    fun addAttachments(attachment: Array<View>){
+        for(i in attachment) attachments.addView(i)
     }
 }

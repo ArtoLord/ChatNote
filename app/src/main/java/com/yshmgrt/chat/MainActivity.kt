@@ -2,7 +2,6 @@ package com.yshmgrt.chat
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import com.yshmgrt.chat.message.AttachmentView
 import com.yshmgrt.chat.message.attachments.Image
 import kotlinx.android.synthetic.main.activity_main.*
 
