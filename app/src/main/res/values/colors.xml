@@ -2,5 +2,12 @@
 <resources>
     <color name="colorPrimary">#009688</color>
     <color name="colorPrimaryDark">#00675b</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorAccent">#ff8f00</color>
+    <color name="colorAccentDark">#c56000</color>
+    <color name="background">#FFFFFF</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="onPrimary">#FFFFFF</color>
+    <color name="onAccent">#FFFFFF</color>
+    <color name="onBackground">#000000</color>
+    <color name="onSurface">#000000</color>
 </resources>
