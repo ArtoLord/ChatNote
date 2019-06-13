@@ -20,7 +20,7 @@
         app:layout_constraintBottom_toTopOf="@id/message_list"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" app:titleTextColor="@color/onPrimary"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/message_list"
