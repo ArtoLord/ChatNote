@@ -8,13 +8,8 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.yshmgrt.chat.adapters.MessageViewAdapter
-import com.yshmgrt.chat.data_base.Callback
-import com.yshmgrt.chat.data_base.Controller
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.drawer_layout.*
-import kotlinx.android.synthetic.main.main_chat_fragment.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,10 +29,6 @@ class MainActivity : AppCompatActivity() {
 
         val host = fragment as NavHostFragment
         navigationController = host.navController
-
-        iten.setOnClickListener {
-            Toast.makeText(this, "ASD", Toast.LENGTH_LONG).show()
-        }
 
         to_notifies_button.setOnClickListener {
             navigationController.navigate(R.id.notificationsFragment)
