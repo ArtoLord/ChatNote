@@ -17,5 +17,14 @@
         <item name="colorControlNormal">@color/onPrimary</item>
     </style>
 
-
+    <style name="ItemTheme" parent="AppTheme">
+        <item name="colorButtonNormal">@color/surface</item>
+        <item name="android:colorButtonNormal">@color/surface</item>
+        <item name="android:textColor">@color/onSurface</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:layout_marginStart">0dp</item>
+        <item name="android:layout_marginEnd">0dp</item>
+        <item name="android:layout_marginTop">0dp</item>
+        <item name="android:layout_marginBottom">0dp</item>
+    </style>
 </resources>
