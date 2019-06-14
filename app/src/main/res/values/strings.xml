@@ -2,4 +2,8 @@
     <string name="app_name">ChatNote</string>
     <string name="search">Search</string>
     <string name="settings">Settings</string>
+    <string name="notifies">Notifies</string>
+    <string name="bookmarks">Bookmarks</string>
+    <string name="best_tags">Best tags</string>
+    <string name="messages">Messages</string>
 </resources>
