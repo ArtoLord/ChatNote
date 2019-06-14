@@ -53,13 +53,13 @@ class Controller(private val ctx: Context):IController {
             }
     }
 
-    fun addMessage(message: SQL_Message){
+    fun addMessage(message: SQL_Message, callback: Callback<Long>){
             ctx.database.use {
-                insert(
+                callback.onEnd(insert(
                     "Message",
                     "text" to message.text,
                     "time" to message.time
-                )
+                ))
             }
 
     }
@@ -124,33 +124,38 @@ class Controller(private val ctx: Context):IController {
 
     }
 
-    fun addTag(tag:Tag){
+    fun addTag(tag:Tag, callback: Callback<Long>){
             ctx.database.use {
+                callback.onEnd(
                 insert(
                     "Tag",
                     "text" to tag.text
                 )
+                )
             }
 
     }
-    fun addAttachment(tag:Attachment){
+    fun addAttachment(tag:Attachment, callback: Callback<Long>){
             ctx.database.use {
+                callback.onEnd(
                 insert(
                     "Attachment",
                     "type" to tag.type,
                     "link" to tag.link,
                     "parentId" to tag.parentId
-                )
+                ))
             }
 
     }
-    fun addLink(tag: Link){
+
+    fun addLink(tag: Link, callback: Callback<Long>){
             ctx.database.use {
+                callback.onEnd(
                 insert(
                     "Link",
                     "messageId" to tag.messageId,
                     "tagId" to tag.tagId
-                )
+                ))
             }
 
     }

@@ -10,7 +10,7 @@ import com.yshmgrt.chat.data_base.dataclasses.Tag
 import org.jetbrains.anko.db.*
 import org.jetbrains.anko.doAsync
 
-class Helper private constructor(ctx: Context):ManagedSQLiteOpenHelper(ctx, "MainDatabase", null, 2) {
+class Helper private constructor(ctx: Context):ManagedSQLiteOpenHelper(ctx, "MainDatabase", null, 3) {
 
     override fun onUpgrade(db: SQLiteDatabase, p1: Int, p2: Int) {
         db.dropTable("Message", true)
@@ -34,7 +34,7 @@ class Helper private constructor(ctx: Context):ManagedSQLiteOpenHelper(ctx, "Mai
         )
         db.createTable("Tag", true,
             "_id" to INTEGER+ PRIMARY_KEY+ UNIQUE,
-            "text" to TEXT
+            "text" to TEXT+ UNIQUE
         )
         db.createTable("Link", true,
             "_id" to INTEGER+ PRIMARY_KEY+ UNIQUE,
