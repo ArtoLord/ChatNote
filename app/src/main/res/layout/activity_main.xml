@@ -10,7 +10,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:elevation="0dp">
         <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="0dp"
@@ -19,7 +20,7 @@
                 android:elevation="4dp"
                 android:minHeight="?attr/actionBarSize"
 
-                android:theme="?attr/actionBarTheme"
+                android:theme="@style/ToolbarTheme"
                 app:layout_constraintBottom_toTopOf="@id/fragment"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

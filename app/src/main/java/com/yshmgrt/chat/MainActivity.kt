@@ -3,6 +3,7 @@ package com.yshmgrt.chat
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
@@ -33,6 +34,10 @@ class MainActivity : AppCompatActivity() {
 
         val host = fragment as NavHostFragment
         navigationController = host.navController
+
+        iten.setOnClickListener {
+            Toast.makeText(this, "ASD", Toast.LENGTH_LONG).show()
+        }
 
         to_notifies_button.setOnClickListener {
             navigationController.navigate(R.id.notificationsFragment)

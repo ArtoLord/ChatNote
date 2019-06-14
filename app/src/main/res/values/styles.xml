@@ -12,4 +12,10 @@
         <item name="actionOverflowButtonStyle">@color/onPrimary</item>
     </style>
 
+    <style name="ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.ActionBar">
+        <!-- Customize color of Toolbar -->
+        <item name="colorControlNormal">@color/onPrimary</item>
+    </style>
+
+
 </resources>

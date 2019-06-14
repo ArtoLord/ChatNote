@@ -3,33 +3,40 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent" android:layout_height="match_parent">
+    <include layout="@android:layout/activity_list_item"
+    android:id="@+id/iten"/>
     <Button
             android:id="@+id/to_main_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/messages"
+            android:theme="@style/ItemTheme"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/to_notifies_button"/>
+            app:layout_constraintBottom_toTopOf="@id/to_notifies_button" android:elevation="0dp"
+            android:layout_margin="0dp" android:padding="0dp"/>
     <Button
             android:id="@+id/to_notifies_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/notifies"
+            android:theme="@style/ItemTheme"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/to_main_button"
-            app:layout_constraintBottom_toTopOf="@id/to_bookmarks_button"/>
+            app:layout_constraintBottom_toTopOf="@id/to_bookmarks_button" android:layout_margin="0dp"
+            android:padding="0dp"/>
     <Button
             android:id="@+id/to_bookmarks_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/bookmarks"
+            android:theme="@style/ItemTheme"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/to_notifies_button"
-            app:layout_constraintBottom_toTopOf="@id/tv"/>
+            app:layout_constraintBottom_toTopOf="@id/tv" android:layout_margin="0dp" android:padding="0dp"/>
     <TextView
             android:id="@+id/tv"
             android:layout_width="0dp"
