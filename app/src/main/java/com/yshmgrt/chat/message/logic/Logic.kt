@@ -14,4 +14,4 @@ class Logic {
         return tags;
     }
 }
-fun main() = Logic(readLine()!!).getTags().forEach { println(it) }
+//fun main() = Logic(readLine()!!).getTags().forEach { println(it) }
