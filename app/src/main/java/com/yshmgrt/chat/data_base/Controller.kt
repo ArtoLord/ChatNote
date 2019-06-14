@@ -1,6 +1,7 @@
 package com.yshmgrt.chat.data_base
 
 import android.content.Context
+import android.util.Log
 import com.yshmgrt.chat.data_base.Helper.Helper
 import com.yshmgrt.chat.data_base.dataclasses.*
 import com.yshmgrt.chat.database
@@ -53,7 +54,7 @@ class Controller(private val ctx: Context):IController {
             }
     }
 
-    fun addMessage(message: SQL_Message, callback: Callback<Long>){
+    private fun addMessage(message: SQL_Message, callback: Callback<Long>){
             ctx.database.use {
                 callback.onEnd(insert(
                     "Message",
@@ -124,7 +125,7 @@ class Controller(private val ctx: Context):IController {
 
     }
 
-    fun addTag(tag:Tag, callback: Callback<Long>){
+    private fun addTag(tag:Tag, callback: Callback<Long>){
             ctx.database.use {
                 val out = insert(
                     "Tag",
@@ -150,7 +151,7 @@ class Controller(private val ctx: Context):IController {
             }
 
     }
-    fun addAttachment(tag:Attachment, callback: Callback<Long>){
+    private fun addAttachment(tag:Attachment, callback: Callback<Long>){
             ctx.database.use {
                 callback.onEnd(
                 insert(
@@ -163,7 +164,7 @@ class Controller(private val ctx: Context):IController {
 
     }
 
-    fun addLink(tag: Link){
+    private fun addLink(tag: Link){
             ctx.database.use {
                 insert(
                     "Link",
@@ -184,4 +185,59 @@ class Controller(private val ctx: Context):IController {
                 .exec()
         }
     }
+    private fun createSQL_message(message: Message): SQL_Message {
+        return SQL_Message(message._id, message.text, message.time.time)
+    }
+
+    fun sendMessage(message:SQL_Message, tags:List<Tag>, attachments:List<Attachment>) {
+        addMessage(message, object: Callback<Long> {
+            override fun onFailure() {
+                Log.d("WORK","failure")
+            }
+
+            override fun onBegin() {
+                Log.d("WORK","begin")
+            }
+
+            override fun onEnd(exit: Long) {
+                Log.d("WORK", "end")
+                val message_id = exit
+                for (i in tags){
+                    addTag(i,object :Callback<Long>{
+                        override fun onFailure() {
+                            Log.d("WORK","failure")
+                        }
+
+                        override fun onBegin() {
+                            Log.d("WORK","begin")
+                        }
+
+                        override fun onEnd(exit: Long) {
+                            Log.d("WORK", "end")
+                            addLink(Link(123,message_id,exit))
+                        }
+                    })
+                }
+                for (i in attachments){
+
+                    addAttachment(Attachment(123,i.type,i.link,message_id),object :Callback<Long>{
+                        override fun onFailure() {
+                            Log.d("WORK","failure")
+                        }
+
+                        override fun onBegin() {
+                            Log.d("WORK","begin")
+                        }
+
+                        override fun onEnd(exit: Long) {
+                            Log.d("WORK", "end")
+                        }
+                    })
+                }
+            }
+
+        })
+
+    }
+
 }
