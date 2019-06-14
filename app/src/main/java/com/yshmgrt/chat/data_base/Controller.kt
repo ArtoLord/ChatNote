@@ -10,7 +10,6 @@ import java.util.*
 
 class Controller(private val ctx: Context):IController {
     override fun getMessageById(_id: Long, callback: Callback<Message>) {
-        doAsync{
             try {
                 callback.onBegin()
                 ctx.database.use {
@@ -52,11 +51,9 @@ class Controller(private val ctx: Context):IController {
             catch (e:Exception){
                 callback.onFailure()
             }
-        }
     }
 
     fun addMessage(message: SQL_Message){
-        doAsync {
             ctx.database.use {
                 insert(
                     "Message",
@@ -64,11 +61,10 @@ class Controller(private val ctx: Context):IController {
                     "time" to message.time
                 )
             }
-        }
+
     }
 
     fun getAllMessageId(callback: Callback<List<Long>>){
-        doAsync{
             try {
                 callback.onBegin()
                 ctx.database.use {
@@ -87,11 +83,10 @@ class Controller(private val ctx: Context):IController {
             catch (e:Exception){
                 callback.onFailure()
             }
-        }
+
     }
 
     override fun getTagById(_id: Long, callback: Callback<Tag>) {
-        doAsync{
             try {
                 callback.onBegin()
                 ctx.database.use {
@@ -107,11 +102,10 @@ class Controller(private val ctx: Context):IController {
             catch (e:Exception){
                 callback.onFailure()
             }
-        }
+
     }
 
     override fun getAttachmentById(_id: Long, callback: Callback<Attachment>) {
-        doAsync{
             try {
                 callback.onBegin()
                 ctx.database.use {
@@ -127,21 +121,19 @@ class Controller(private val ctx: Context):IController {
             catch (e:Exception){
                 callback.onFailure()
             }
-        }
+
     }
 
     fun addTag(tag:Tag){
-        doAsync {
             ctx.database.use {
                 insert(
                     "Tag",
                     "text" to tag.text
                 )
             }
-        }
+
     }
     fun addAttachment(tag:Attachment){
-        doAsync {
             ctx.database.use {
                 insert(
                     "Attachment",
@@ -150,10 +142,9 @@ class Controller(private val ctx: Context):IController {
                     "parentId" to tag.parentId
                 )
             }
-        }
+
     }
     fun addLink(tag: Link){
-        doAsync {
             ctx.database.use {
                 insert(
                     "Link",
@@ -161,7 +152,7 @@ class Controller(private val ctx: Context):IController {
                     "tagId" to tag.tagId
                 )
             }
-        }
+
     }
     fun updateMessage(message:SQL_Message){
         ctx.database.use {
