@@ -1,10 +1,13 @@
 package com.yshmgrt.chat.view
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.yshmgrt.chat.R
@@ -20,6 +23,7 @@ class MainChatFragment : Fragment() {
 
     var adapter: MessageViewAdapter? = null
     private lateinit var linearLayoutManager: LinearLayoutManager
+    val messageList = mutableListOf<Long>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.main_chat_fragment, container, false)
@@ -39,7 +43,9 @@ class MainChatFragment : Fragment() {
             }
 
             override fun onEnd(exit: List<Long>) {
-                adapter = MessageViewAdapter(exit)
+                messageList.clear()
+                messageList.addAll(exit)
+                adapter = MessageViewAdapter(messageList)
                 Log.d("WORK",exit.size.toString())
                 view.message_list_1.adapter = adapter
                 Log.d("Work", view.message_list_1.adapter.toString() + " 2")

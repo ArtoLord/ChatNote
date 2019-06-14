@@ -56,11 +56,17 @@ class Controller(private val ctx: Context):IController {
 
     private fun addMessage(message: SQL_Message, callback: Callback<Long>){
             ctx.database.use {
-                callback.onEnd(insert(
+                val exit = insert(
                     "Message",
                     "text" to message.text,
                     "time" to message.time
-                ))
+                )
+                callback.onEnd(exit)
+                insert(
+                    Helper.VIRTUAL_MESSAGE_TABLE,
+                    "text" to message.text,
+                    "_id" to exit
+                )
             }
 
     }
@@ -145,6 +151,11 @@ class Controller(private val ctx: Context):IController {
                         }
                 }
                 else{
+                    insert(
+                        Helper.VIRTUAL_TAG_TABLE,
+                        "text" to tag.text,
+                        "_id" to out
+                    )
                     callback.onEnd(out)
                 }
 
@@ -238,6 +249,110 @@ class Controller(private val ctx: Context):IController {
 
         })
 
+    }
+
+    fun getMessagesByTagId(_id: Long, callback: Callback<List<Long>>){
+        try{
+            callback.onBegin()
+            ctx.database.use {
+                select(
+                    "Link",
+                    "messageId"
+                )
+                    .whereArgs(
+                        "tagId = {tag}",
+                        "tag" to _id
+                    )
+                    .exec {
+                        callback.onEnd(
+                            parseList(object :MapRowParser<Long>{
+                                override fun parseRow(columns: Map<String, Any?>): Long {
+                                    return columns.getValue("messageId").toString().toLong()
+                                }
+                            })
+                        )
+                    }
+            }
+        }
+        catch (e:Exception){
+            callback.onFailure()
+        }
+    }
+
+    fun getMessageIdsByTagPart(tagPart:String, callback: Callback<Collection<Long>>){
+        try{
+            ctx.database.use {
+                select(
+                    Helper.VIRTUAL_TAG_TABLE,
+                    "_id"
+                )
+                    .whereArgs(
+                        "text MATCH {tag}",
+                        "tag" to "$tagPart*"
+                    )
+                    .exec {
+                        val ids = parseList(
+                            object :MapRowParser<Long>{
+                                override fun parseRow(columns: Map<String, Any?>): Long {
+                                    return columns.getValue("_id").toString().toLong()
+                                }
+
+                            }
+                        )
+                        val messageSet = mutableSetOf<Long>()
+                        for (i in ids){
+                            getMessagesByTagId(i,object :Callback<List<Long>>{
+                                override fun onFailure() {}
+
+                                override fun onBegin() {}
+
+                                override fun onEnd(exit: List<Long>) {
+                                    messageSet.addAll(exit)
+                                }
+                            })
+                        }
+                        callback.onEnd(messageSet)
+
+                    }
+            }
+        }
+        catch(e:Exception){
+            e.printStackTrace()
+            callback.onFailure()
+        }
+    }
+
+
+
+    fun getMessageByMessagePatr(messagePart:String, callback: Callback<List<Long>>){
+        try{
+            ctx.database.use {
+                select(
+                    Helper.VIRTUAL_MESSAGE_TABLE,
+                    "_id"
+                )
+                    .whereArgs(
+                        "text MATCH {tag}",
+                        "tag" to "*$messagePart*"
+                    )
+                    .exec {
+                        val ids = parseList(
+                            object :MapRowParser<Long>{
+                                override fun parseRow(columns: Map<String, Any?>): Long {
+                                    return columns.getValue("_id").toString().toLong()
+                                }
+
+                            }
+                        )
+                        callback.onEnd(ids)
+
+                    }
+            }
+        }
+        catch(e:Exception){
+            e.printStackTrace()
+            callback.onFailure()
+        }
     }
 
 }

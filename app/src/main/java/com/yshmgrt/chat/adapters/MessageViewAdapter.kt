@@ -48,7 +48,7 @@ class MessageViewAdapter(val messageIds:List<Long>): RecyclerView.Adapter<Messag
                         }
 
                         override fun onEnd(exit: Tag) {
-                            viewHolder.messageView.addTags(arrayOf(exit.text))
+                            viewHolder.messageView.addTags(listOf(exit.text))
                         }
 
                     })

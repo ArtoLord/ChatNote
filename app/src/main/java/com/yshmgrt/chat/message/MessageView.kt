@@ -19,15 +19,18 @@ class MessageView @JvmOverloads constructor(
             .inflate(R.layout.message_view, this, true)
     }
 
-
+    val tagList = mutableListOf<String>()
     fun setMessageText(text:String){
         message_text.text = text
     }
-    fun addTags(tags:Array<String>){
+    fun addTags(tags:Collection<String>){
         for (i in tags){
-            val tag = TagView(this.context)
-            tag.setText(i)
-            teg_field.addView(tag)
+            if (i !in tagList) {
+                tagList.add(i)
+                val tag = TagView(this.context)
+                tag.setText(i)
+                teg_field.addView(tag)
+            }
         }
     }
     fun addAttachments(attachment: Array<View>){
