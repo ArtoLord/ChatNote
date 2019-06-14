@@ -1,11 +1,11 @@
 package com.yshmgrt.chat.message
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
+import androidx.recyclerview.widget.RecyclerView
 import com.yshmgrt.chat.R
 import kotlinx.android.synthetic.main.message_view.view.*
 
@@ -33,5 +33,5 @@ class MessageView @JvmOverloads constructor(
     fun addAttachments(attachment: Array<View>){
         for(i in attachment) attachments.addView(i)
     }
-    class MessageViewHolder(val messageView: MessageView):RecyclerView.ViewHolder(messageView)
+    class MessageViewHolder(val messageView: MessageView): RecyclerView.ViewHolder(messageView)
 }
