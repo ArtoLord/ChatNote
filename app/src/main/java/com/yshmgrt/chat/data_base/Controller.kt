@@ -54,14 +54,22 @@ class Controller(private val ctx: Context):IController {
             }
     }
 
-    private fun addMessage(message: SQL_Message, callback: Callback<Long>){
+    fun getMessageById(_id:Long,onEnd:(Message) -> Unit){
+        getMessageById(_id,object:Callback<Message>{
+            override fun onFailure() {}
+            override fun onBegin() {}
+            override fun onEnd(exit: Message) {onEnd(exit)}
+        })
+    }
+
+    private fun addMessage(message: SQL_Message, onEnd: (Long) -> Unit){
             ctx.database.use {
                 val exit = insert(
                     "Message",
                     "text" to message.text,
                     "time" to message.time
                 )
-                callback.onEnd(exit)
+                onEnd(exit)
                 insert(
                     Helper.VIRTUAL_MESSAGE_TABLE,
                     "text" to message.text,
@@ -70,6 +78,7 @@ class Controller(private val ctx: Context):IController {
             }
 
     }
+
 
     fun getAllMessageId(callback: Callback<List<Long>>){
             try {
@@ -92,6 +101,26 @@ class Controller(private val ctx: Context):IController {
             }
 
     }
+    fun getAllMessageId(lambda:(List<Long>)->Unit){
+        try {
+            ctx.database.use {
+                select("Message","_id")
+                    .exec {
+                        lambda(
+                            parseList(object : MapRowParser<Long> {
+                                override fun parseRow(columns: Map<String, Any?>): Long {
+                                    return columns.getValue("_id").toString().toLong()
+                                }
+                            })
+                        )
+                    }
+            }
+        }
+        catch (e:Exception){
+            e.printStackTrace()
+        }
+    }
+
 
     override fun getTagById(_id: Long, callback: Callback<Tag>) {
             try {
@@ -110,6 +139,23 @@ class Controller(private val ctx: Context):IController {
                 callback.onFailure()
             }
 
+    }
+
+    fun getTagById(_id: Long,onEnd: (Tag) -> Unit){
+        try {
+            ctx.database.use {
+                select("Tag")
+                    .whereArgs("_id = {id}", "id" to _id)
+                    .exec {
+                        onEnd(
+                            parseSingle(classParser())
+                        )
+                    }
+            }
+        }
+        catch (e:Exception){
+            e.printStackTrace()
+        }
     }
 
     override fun getAttachmentById(_id: Long, callback: Callback<Attachment>) {
@@ -131,7 +177,25 @@ class Controller(private val ctx: Context):IController {
 
     }
 
-    private fun addTag(tag:Tag, callback: Callback<Long>){
+    fun getAttachmentById(_id: Long, onEnd:(Attachment)->Unit) {
+        try {
+            ctx.database.use {
+                select("Attachment")
+                    .whereArgs("_id = {id}", "id" to _id)
+                    .exec {
+                        onEnd(
+                            parseSingle(classParser())
+                        )
+                    }
+            }
+        }
+        catch (e:Exception){
+            e.printStackTrace()
+        }
+
+    }
+
+    private fun addTag(tag:Tag, onEnd:(Long)->Unit){
             ctx.database.use {
                 val out = insert(
                     "Tag",
@@ -141,7 +205,7 @@ class Controller(private val ctx: Context):IController {
                     select("Tag","_id")
                         .whereArgs("text = {_text}","_text" to tag.text)
                         .exec {
-                            callback.onEnd(
+                            onEnd(
                                 parseSingle(object :MapRowParser<Long>{
                                     override fun parseRow(columns: Map<String, Any?>): Long {
                                         return columns.getValue("_id").toString().toLong()
@@ -156,15 +220,15 @@ class Controller(private val ctx: Context):IController {
                         "text" to tag.text,
                         "_id" to out
                     )
-                    callback.onEnd(out)
+                    onEnd(out)
                 }
 
             }
 
     }
-    private fun addAttachment(tag:Attachment, callback: Callback<Long>){
+    private fun addAttachment(tag:Attachment, onEnd: (Long) -> Unit){
             ctx.database.use {
-                callback.onEnd(
+                onEnd(
                 insert(
                     "Attachment",
                     "type" to tag.type,
@@ -201,57 +265,24 @@ class Controller(private val ctx: Context):IController {
     }
 
     fun sendMessage(message:SQL_Message, tags:List<Tag>, attachments:List<Attachment>) {
-        addMessage(message, object: Callback<Long> {
-            override fun onFailure() {
-                Log.d("WORK","failure")
-            }
+        addMessage(message) { it ->
+            Log.d("WORK", "end")
+            val message_id = it
+            for (i in tags) {
+                addTag(i) { exit ->
+                    Log.d("WORK", "end")
+                    addLink(Link(123, message_id, exit))
 
-            override fun onBegin() {
-                Log.d("WORK","begin")
-            }
-
-            override fun onEnd(exit: Long) {
-                Log.d("WORK", "end")
-                val message_id = exit
-                for (i in tags){
-                    addTag(i,object :Callback<Long>{
-                        override fun onFailure() {
-                            Log.d("WORK","failure")
-                        }
-
-                        override fun onBegin() {
-                            Log.d("WORK","begin")
-                        }
-
-                        override fun onEnd(exit: Long) {
-                            Log.d("WORK", "end")
-                            addLink(Link(123,message_id,exit))
-                        }
-                    })
                 }
-                for (i in attachments){
+                for (a in attachments) {
 
-                    addAttachment(Attachment(123,i.type,i.link,message_id),object :Callback<Long>{
-                        override fun onFailure() {
-                            Log.d("WORK","failure")
-                        }
-
-                        override fun onBegin() {
-                            Log.d("WORK","begin")
-                        }
-
-                        override fun onEnd(exit: Long) {
-                            Log.d("WORK", "end")
-                        }
-                    })
+                    addAttachment(Attachment(123, a.type, a.link, message_id)) {}
                 }
             }
-
-        })
-
+        }
     }
 
-    fun getMessagesByTagId(_id: Long, callback: Callback<List<Long>>){
+        fun getMessagesByTagId(_id: Long, callback: Callback<List<Long>>){
         try{
             callback.onBegin()
             ctx.database.use {
@@ -279,6 +310,34 @@ class Controller(private val ctx: Context):IController {
         }
     }
 
+    fun getMessagesByTagId(_id: Long, onEnd:(List<Long>)->Unit){
+        try{
+            ctx.database.use {
+                select(
+                    "Link",
+                    "messageId"
+                )
+                    .whereArgs(
+                        "tagId = {tag}",
+                        "tag" to _id
+                    )
+                    .exec {
+                        onEnd(
+                            parseList(object :MapRowParser<Long>{
+                                override fun parseRow(columns: Map<String, Any?>): Long {
+                                    return columns.getValue("messageId").toString().toLong()
+                                }
+                            })
+                        )
+                    }
+            }
+        }
+        catch (e:Exception){
+            e.printStackTrace()
+        }
+    }
+
+
     fun getMessageIdsByTagPart(tagPart:String, callback: Callback<Collection<Long>>){
         try{
             ctx.database.use {
@@ -301,15 +360,9 @@ class Controller(private val ctx: Context):IController {
                         )
                         val messageSet = mutableSetOf<Long>()
                         for (i in ids){
-                            getMessagesByTagId(i,object :Callback<List<Long>>{
-                                override fun onFailure() {}
-
-                                override fun onBegin() {}
-
-                                override fun onEnd(exit: List<Long>) {
-                                    messageSet.addAll(exit)
-                                }
-                            })
+                            getMessagesByTagId(i) {
+                                messageSet.addAll(it)
+                            }
                         }
                         callback.onEnd(messageSet)
 
@@ -319,6 +372,42 @@ class Controller(private val ctx: Context):IController {
         catch(e:Exception){
             e.printStackTrace()
             callback.onFailure()
+        }
+    }
+
+    fun getMessageIdsByTagPart(tagPart:String,onEnd:(Collection<Long>)->Unit){
+        try{
+            ctx.database.use {
+                select(
+                    Helper.VIRTUAL_TAG_TABLE,
+                    "_id"
+                )
+                    .whereArgs(
+                        "text MATCH {tag}",
+                        "tag" to "$tagPart*"
+                    )
+                    .exec {
+                        val ids = parseList(
+                            object :MapRowParser<Long>{
+                                override fun parseRow(columns: Map<String, Any?>): Long {
+                                    return columns.getValue("_id").toString().toLong()
+                                }
+
+                            }
+                        )
+                        val messageSet = mutableSetOf<Long>()
+                        for (i in ids){
+                            getMessagesByTagId(i) {
+                                messageSet.addAll(it)
+                            }
+                        }
+                        onEnd(messageSet)
+
+                    }
+            }
+        }
+        catch(e:Exception){
+            e.printStackTrace()
         }
     }
 
@@ -352,6 +441,36 @@ class Controller(private val ctx: Context):IController {
         catch(e:Exception){
             e.printStackTrace()
             callback.onFailure()
+        }
+    }
+
+    fun getMessageByMessagePatr(messagePart:String, onEnd:(List<Long>)->Unit){
+        try{
+            ctx.database.use {
+                select(
+                    Helper.VIRTUAL_MESSAGE_TABLE,
+                    "_id"
+                )
+                    .whereArgs(
+                        "text MATCH {tag}",
+                        "tag" to "*$messagePart*"
+                    )
+                    .exec {
+                        val ids = parseList(
+                            object :MapRowParser<Long>{
+                                override fun parseRow(columns: Map<String, Any?>): Long {
+                                    return columns.getValue("_id").toString().toLong()
+                                }
+
+                            }
+                        )
+                        onEnd(ids)
+
+                    }
+            }
+        }
+        catch(e:Exception){
+            e.printStackTrace()
         }
     }
 
