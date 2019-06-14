@@ -126,12 +126,27 @@ class Controller(private val ctx: Context):IController {
 
     fun addTag(tag:Tag, callback: Callback<Long>){
             ctx.database.use {
-                callback.onEnd(
-                insert(
+                val out = insert(
                     "Tag",
                     "text" to tag.text
                 )
-                )
+                if (out ==-1L){
+                    select("Tag","_id")
+                        .whereArgs("text = {_text}","_text" to tag.text)
+                        .exec {
+                            callback.onEnd(
+                                parseSingle(object :MapRowParser<Long>{
+                                    override fun parseRow(columns: Map<String, Any?>): Long {
+                                        return columns.getValue("_id").toString().toLong()
+                                    }
+                                })
+                            )
+                        }
+                }
+                else{
+                    callback.onEnd(out)
+                }
+
             }
 
     }
@@ -148,14 +163,13 @@ class Controller(private val ctx: Context):IController {
 
     }
 
-    fun addLink(tag: Link, callback: Callback<Long>){
+    fun addLink(tag: Link){
             ctx.database.use {
-                callback.onEnd(
                 insert(
                     "Link",
                     "messageId" to tag.messageId,
                     "tagId" to tag.tagId
-                ))
+                )
             }
 
     }

@@ -10,7 +10,7 @@ import com.yshmgrt.chat.data_base.dataclasses.Tag
 import org.jetbrains.anko.db.*
 import org.jetbrains.anko.doAsync
 
-class Helper private constructor(ctx: Context):ManagedSQLiteOpenHelper(ctx, "MainDatabase", null, 3) {
+class Helper private constructor(ctx: Context):ManagedSQLiteOpenHelper(ctx, "MainDatabase", null, 1) {
 
     override fun onUpgrade(db: SQLiteDatabase, p1: Int, p2: Int) {
         db.dropTable("Message", true)

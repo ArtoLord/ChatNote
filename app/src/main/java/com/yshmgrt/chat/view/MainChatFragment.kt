@@ -11,6 +11,8 @@ import com.yshmgrt.chat.R
 import com.yshmgrt.chat.adapters.MessageViewAdapter
 import com.yshmgrt.chat.data_base.Callback
 import com.yshmgrt.chat.data_base.Controller
+import com.yshmgrt.chat.data_base.dataclasses.SQL_Message
+import com.yshmgrt.chat.data_base.dataclasses.Tag
 import kotlinx.android.synthetic.main.main_chat_fragment.*
 import kotlinx.android.synthetic.main.main_chat_fragment.view.*
 
@@ -22,14 +24,13 @@ class MainChatFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.main_chat_fragment, container, false)
         linearLayoutManager = LinearLayoutManager(context!!.applicationContext)
-        val list = listOf(1L, 2L, 3L)
         view.message_list_1.layoutManager = LinearLayoutManager(context!!.applicationContext)
-        view.message_list_1.adapter = MessageViewAdapter(list)
+        view.message_list_1.adapter = MessageViewAdapter(emptyList())
         Log.d("Work", view.message_list_1.adapter.toString())
         val controller = Controller(context!!)
         controller.getAllMessageId(object: Callback<List<Long>> {
             override fun onFailure() {
-                Log.d("WORK","failure")
+                Log.d("WORK","message failure")
             }
 
             override fun onBegin() {
