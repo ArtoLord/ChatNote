@@ -20,22 +20,12 @@ class MainChatFragment : Fragment() {
     private lateinit var linearLayoutManager: LinearLayoutManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.main_chat_fragment, container, false)
-
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        linearLayoutManager = LinearLayoutManager(context!!)
+        val view = inflater.inflate(R.layout.main_chat_fragment, container, false)
+        linearLayoutManager = LinearLayoutManager(context!!.applicationContext)
         val list = listOf(1L, 2L, 3L)
-        message_list.layoutManager = LinearLayoutManager(activity)
-        message_list.adapter = MessageViewAdapter(list, activity!!)
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-
+        view.message_list_1.layoutManager = LinearLayoutManager(context!!.applicationContext)
+        view.message_list_1.adapter = MessageViewAdapter(list)
+        Log.d("Work", view.message_list_1.adapter.toString())
         val controller = Controller(context!!)
         controller.getAllMessageId(object: Callback<List<Long>> {
             override fun onFailure() {
@@ -48,12 +38,19 @@ class MainChatFragment : Fragment() {
             }
 
             override fun onEnd(exit: List<Long>) {
-                adapter = MessageViewAdapter(exit, context!!)
+                adapter = MessageViewAdapter(exit)
                 Log.d("WORK",exit.size.toString())
-                message_list.adapter = adapter
+                view.message_list_1.adapter = adapter
+                Log.d("Work", view.message_list_1.adapter.toString() + " 2")
                 adapter!!.notifyDataSetChanged()
             }
         })
-        adapter?.notifyDataSetChanged()
+        Log.d("Work", view.message_list_1.adapter.toString() + " 1")
+        return view
+    }
+
+    override fun onStart() {
+        Log.d("Work", message_list_1.adapter.toString() + " 3")
+        super.onStart()
     }
 }

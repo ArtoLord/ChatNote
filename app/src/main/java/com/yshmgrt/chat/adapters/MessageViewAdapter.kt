@@ -10,10 +10,12 @@ import com.yshmgrt.chat.data_base.dataclasses.Message
 import com.yshmgrt.chat.data_base.dataclasses.Tag
 import com.yshmgrt.chat.message.MessageView
 
-class MessageViewAdapter(val messageIds:List<Long>, val ctx:Context): RecyclerView.Adapter<MessageView.MessageViewHolder>() {
-    val controller:Controller =  Controller(ctx)
+class MessageViewAdapter(val messageIds:List<Long>): RecyclerView.Adapter<MessageView.MessageViewHolder>() {
+    lateinit var controller:Controller
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): MessageView.MessageViewHolder {
+        controller = Controller(parent.context)
         val view = MessageView(parent.context)
+
         return MessageView.MessageViewHolder(view)
     }
 
