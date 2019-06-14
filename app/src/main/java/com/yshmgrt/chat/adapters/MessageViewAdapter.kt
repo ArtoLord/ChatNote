@@ -25,37 +25,12 @@ class MessageViewAdapter(val messageIds:List<Long>): RecyclerView.Adapter<Messag
 
     override fun onBindViewHolder(viewHolder: MessageView.MessageViewHolder, position: Int) {
         val id = messageIds[position]
-        controller.getMessageById(id,object:Callback<Message>{
-            override fun onFailure() {
-                Log.d("WORK","failure")
+        controller.getMessageById(id){
+                viewHolder.messageView.setMessageText(it.text)
+                Log.d("WORK",it.text)
+                for (i in it.tags)
+                    controller.getTagById(i){exit->viewHolder.messageView.addTags(listOf(exit.text)) }
             }
-
-            override fun onBegin() {
-                Log.d("WORK","begin")
-            }
-
-            override fun onEnd(exit: Message) {
-                viewHolder.messageView.setMessageText(exit.text)
-                Log.d("WORK",exit.text)
-                for (i in exit.tags){
-                    controller.getTagById(i,object : Callback<Tag>{
-                        override fun onFailure() {
-                            Log.d("WORK","failure")
-                        }
-
-                        override fun onBegin() {
-                            return
-                        }
-
-                        override fun onEnd(exit: Tag) {
-                            viewHolder.messageView.addTags(listOf(exit.text))
-                        }
-
-                    })
-                }
-            }
-
-        })
     }
 }
 
