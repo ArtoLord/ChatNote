@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent" android:layout_height="match_parent">
+    <Button
+            android:id="@+id/to_main_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/messages"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/to_notifies_button"/>
+    <Button
+            android:id="@+id/to_notifies_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/notifies"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/to_main_button"
+            app:layout_constraintBottom_toTopOf="@id/to_bookmarks_button"/>
+    <Button
+            android:id="@+id/to_bookmarks_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/bookmarks"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/to_notifies_button"
+            app:layout_constraintBottom_toTopOf="@id/tv"/>
+    <TextView
+            android:id="@+id/tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/best_tags"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/to_bookmarks_button"
+            app:layout_constraintBottom_toTopOf="@id/best_tags_recycler"/>
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/best_tags_recycler"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
