@@ -9,7 +9,6 @@ Message:
 Tag:
 - ID
 - Text
-- isImportant
 
 Attachment - JSON с любым типом вложения (в том числе ссылка на картинку)
 
@@ -25,7 +24,6 @@ Tag:
 
 - _id : long
 - text : String
-- isImportant : boolean
 
 Attachment:
 
@@ -33,6 +31,7 @@ Attachment:
 - type : String // Int
 - link : JSONString
 - parentId : long
+
 Link:
 
 - _id : long
