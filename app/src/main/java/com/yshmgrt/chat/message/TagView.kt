@@ -32,4 +32,9 @@ class TagView : LinearLayout {
     fun setText(a:String){
         tag_text.text = a
     }
+    var _id = 0L
+    fun setText(id:Long){
+        _id = id
+    }
+
 }

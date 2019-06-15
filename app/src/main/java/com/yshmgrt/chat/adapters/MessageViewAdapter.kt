@@ -9,13 +9,13 @@ import com.yshmgrt.chat.data_base.Controller
 import com.yshmgrt.chat.data_base.dataclasses.Message
 import com.yshmgrt.chat.data_base.dataclasses.Tag
 import com.yshmgrt.chat.message.MessageView
+import com.yshmgrt.chat.message.OpenMessageView
 
 class MessageViewAdapter(val messageIds:List<Long>): RecyclerView.Adapter<MessageView.MessageViewHolder>() {
     lateinit var controller:Controller
-    override fun onCreateViewHolder(parent: ViewGroup, p1: Int): MessageView.MessageViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, position: Int): MessageView.MessageViewHolder {
         controller = Controller(parent.context)
-        val view = MessageView(parent.context)
-
+        var view = MessageView(parent.context)
         return MessageView.MessageViewHolder(view)
     }
 
@@ -27,7 +27,7 @@ class MessageViewAdapter(val messageIds:List<Long>): RecyclerView.Adapter<Messag
         val id = messageIds[position]
         controller.getMessageById(id){
                 viewHolder.messageView.setMessageText(it.text)
-                Log.d("WORK",it.text)
+                Log.d("WORK",it.toString())
                 for (i in it.tags)
                     controller.getTagById(i){exit->viewHolder.messageView.addTags(listOf(exit.text)) }
             }

@@ -264,7 +264,7 @@ class Controller(private val ctx: Context):IController {
         return SQL_Message(message._id, message.text, message.time.time)
     }
 
-    fun sendMessage(message:SQL_Message, tags:List<Tag>, attachments:List<Attachment>) {
+    fun sendMessage(message:SQL_Message, tags:List<Tag>, attachments:List<Attachment>,onSended:(Boolean)->Unit) {
         addMessage(message) { it ->
             Log.d("WORK", "end")
             val message_id = it
@@ -272,13 +272,13 @@ class Controller(private val ctx: Context):IController {
                 addTag(i) { exit ->
                     Log.d("WORK", "end")
                     addLink(Link(123, message_id, exit))
-
-                }
-                for (a in attachments) {
-
-                    addAttachment(Attachment(123, a.type, a.link, message_id)) {}
                 }
             }
+            for (a in attachments) {
+
+                addAttachment(Attachment(123, a.type, a.link, message_id)) {}
+            }
+            onSended(true)
         }
     }
 
