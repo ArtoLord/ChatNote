@@ -4,10 +4,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
@@ -17,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.yshmgrt.chat.R
 import com.yshmgrt.chat.adapters.MessageViewAdapter
+import com.yshmgrt.chat.adapters.TagViewAdapter
 import com.yshmgrt.chat.data_base.Callback
 import com.yshmgrt.chat.data_base.Controller
 import com.yshmgrt.chat.data_base.dataclasses.Attachment
@@ -25,6 +23,7 @@ import com.yshmgrt.chat.data_base.dataclasses.SQL_Message
 import com.yshmgrt.chat.data_base.dataclasses.Tag
 import com.yshmgrt.chat.message.logic.Logic
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.main_chat_fragment.*
 import kotlinx.android.synthetic.main.main_chat_fragment.view.*
 import kotlinx.android.synthetic.main.tag_view.view.*
@@ -32,6 +31,10 @@ import org.jetbrains.anko.bundleOf
 import java.util.*
 
 class MainChatFragment : Fragment() {
+
+
+
+
 
     var adapter: MessageViewAdapter? = null
     private lateinit var linearLayoutManager: LinearLayoutManager
@@ -53,9 +56,21 @@ class MainChatFragment : Fragment() {
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        setHasOptionsMenu(true)
+        super.onCreate(savedInstanceState)
+    }
+
+    lateinit var tagsCard:View
+    lateinit var tagsRecycle:RecyclerView
+    lateinit var editSearch:EditText
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.main_chat_fragment, container, false)
         val controller = Controller(context!!)
+        tagsRecycle = view.tags_recycler
+        tagsCard = view.tags_card
+        editSearch = view.search_edit_text
         adapter = MessageViewAdapter(messageList,{
             val _id = it.tag.toString().toLong()
             updateMessageList(controller,_id){
@@ -97,7 +112,88 @@ class MainChatFragment : Fragment() {
         return view
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+    }
+
+    fun onSearchVisible(){
+        val controller = Controller(context!!)
+        val tagList = mutableListOf<Long>()
+        val tagAdapter = TagViewAdapter(tagList){
+            val _id = it.tag.toString().toLong()
+            updateMessageList(controller,_id){
+                adapter!!.notifyDataSetChanged()
+                message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
+            }
+        }
+        /*
+        val linearTagLayoutManager = LinearLayoutManager(context!!.applicationContext)
+        linearTagLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
+        tagsRecycle.layoutManager = linearTagLayoutManager
+        tagsRecycle.adapter = tagAdapter
+        */
+        editSearch.afterTextChanged {
+            controller.getMessageByMessagePatr(it){exit->
+                val a = mutableSetOf<Long>()
+                a.addAll(exit)
+
+                messageList.clear()
+                messageList.addAll(a)
+                adapter!!.notifyDataSetChanged()
+                message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
+                Log.d("Work",exit.size.toString())
+
+            }
+            /*
+            controller.getTagByTagPart(it){exit->
+                val a = mutableSetOf<Long>()
+                a.addAll(exit)
+                tagList.clear()
+                tagList.addAll(a)
+                tagAdapter.notifyDataSetChanged()
+                */
+            }
+        }
+
+
+
+    fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
+        this.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun afterTextChanged(editable: Editable?) {
+                afterTextChanged.invoke(editable.toString())
+            }
+        })
+    }
+
+    var searchVisable = false
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.search_button){
+
+            val status = when(searchVisable){
+                true->View.GONE
+                false->View.VISIBLE
+            }
+            tagsCard.visibility = status
+
+            searchVisable = !searchVisable
+            if(searchVisable){
+                onSearchVisible()
+            }
+            else{
+                updateMessageList(Controller(context!!)){
+                    adapter!!.notifyDataSetChanged()
+                    message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
+                }
+            }
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

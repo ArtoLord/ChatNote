@@ -422,7 +422,7 @@ class Controller(private val ctx: Context):IController {
                 )
                     .whereArgs(
                         "text MATCH {tag}",
-                        "tag" to "*$messagePart*"
+                        "tag" to "$messagePart*"
                     )
                     .exec {
                         val ids = parseList(
@@ -453,7 +453,37 @@ class Controller(private val ctx: Context):IController {
                 )
                     .whereArgs(
                         "text MATCH {tag}",
-                        "tag" to "*$messagePart*"
+                        "tag" to "$messagePart*"
+                    )
+                    .exec {
+                        val ids = parseList(
+                            object :MapRowParser<Long>{
+                                override fun parseRow(columns: Map<String, Any?>): Long {
+                                    return columns.getValue("_id").toString().toLong()
+                                }
+
+                            }
+                        )
+                        onEnd(ids)
+
+                    }
+            }
+        }
+        catch(e:Exception){
+            e.printStackTrace()
+        }
+    }
+
+    fun getTagByTagPart(tagPart:String, onEnd:(List<Long>)->Unit){
+        try{
+            ctx.database.use {
+                select(
+                    Helper.VIRTUAL_TAG_TABLE,
+                    "_id"
+                )
+                    .whereArgs(
+                        "text MATCH {tag}",
+                        "tag" to "$tagPart*"
                     )
                     .exec {
                         val ids = parseList(

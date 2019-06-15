@@ -23,7 +23,8 @@
                 app:layout_constraintBottom_toTopOf="@id/fragment"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" app:titleTextColor="@color/onPrimary"/>
+                app:layout_constraintTop_toTopOf="parent" app:titleTextColor="@color/onPrimary">
+        </androidx.appcompat.widget.Toolbar>
         <fragment
                 android:name="androidx.navigation.fragment.NavHostFragment"
                 android:layout_width="0dp"

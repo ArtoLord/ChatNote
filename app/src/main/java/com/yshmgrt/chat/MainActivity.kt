@@ -1,19 +1,28 @@
 package com.yshmgrt.chat
 
+import android.opengl.Visibility
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.EditText
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.yshmgrt.chat.adapters.MessageViewAdapter
+import com.yshmgrt.chat.adapters.TagViewAdapter
 import com.yshmgrt.chat.data_base.Callback
 import com.yshmgrt.chat.data_base.Controller
+import com.yshmgrt.chat.view.MainChatFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.drawer_layout.*
 import kotlinx.android.synthetic.main.main_chat_fragment.*
+import kotlinx.android.synthetic.main.main_chat_fragment.view.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -58,10 +67,22 @@ class MainActivity : AppCompatActivity() {
         drawerToggle.syncState()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (drawerToggle.onOptionsItemSelected(item))
-            return true
+    var searchVisable = false
 
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         return super.onOptionsItemSelected(item)
+    }
+    fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
+        this.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun afterTextChanged(editable: Editable?) {
+                afterTextChanged.invoke(editable.toString())
+            }
+        })
     }
 }

@@ -6,6 +6,7 @@ import android.os.Build
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
+import androidx.recyclerview.widget.RecyclerView
 import com.yshmgrt.chat.R
 import kotlinx.android.synthetic.main.tag_view.view.*
 
@@ -29,12 +30,7 @@ class TagView : LinearLayout {
         LayoutInflater.from(context)
             .inflate(R.layout.tag_view, this, true)
     }
-    fun setText(a:String){
-        tag_text.text = a
-    }
-    var _id = 0L
-    fun setText(id:Long){
-        _id = id
-    }
+
+    class TagViewHolder(val tagView: TagView): RecyclerView.ViewHolder(tagView)
 
 }
