@@ -12,14 +12,15 @@ import com.yshmgrt.chat.data_base.dataclasses.Tag
 import com.yshmgrt.chat.message.MessageView
 import com.yshmgrt.chat.message.TagView
 
-class MessageViewAdapter(val messageIds:List<Long>, val tagOnClick:(View)->Unit): RecyclerView.Adapter<MessageView.MessageViewHolder>() {
+class MessageViewAdapter(val messageIds:List<Long>,
+                         val tagOnClick:(View)->Unit,
+                         val messageOnClick:(View)->Unit): RecyclerView.Adapter<MessageView.MessageViewHolder>() {
     lateinit var controller:Controller
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): MessageView.MessageViewHolder {
         controller = Controller(parent.context)
         var view = MessageView(parent.context)
         return MessageView.MessageViewHolder(view)
     }
-
     override fun getItemCount(): Int {
         return messageIds.size
     }
@@ -27,6 +28,9 @@ class MessageViewAdapter(val messageIds:List<Long>, val tagOnClick:(View)->Unit)
     override fun onBindViewHolder(viewHolder: MessageView.MessageViewHolder, position: Int) {
         val id = messageIds[position]
         viewHolder.messageView.setThisMessage(id,controller,tagOnClick)
+        viewHolder.messageView.setOnClickListener {
+            messageOnClick(it)
+        }
 
     }
 }

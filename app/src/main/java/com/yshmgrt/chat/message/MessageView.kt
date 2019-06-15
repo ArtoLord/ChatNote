@@ -14,6 +14,7 @@ import com.yshmgrt.chat.data_base.dataclasses.Tag
 import kotlinx.android.synthetic.main.message_view.view.*
 import kotlinx.android.synthetic.main.tag_view.view.*
 import org.jetbrains.anko.childrenRecursiveSequence
+import java.util.*
 
 class MessageView @JvmOverloads constructor(
     context: Context,
@@ -32,6 +33,10 @@ class MessageView @JvmOverloads constructor(
         controller.getMessageById(message){
             teg_field.removeAllViews()
             message_text.text = it.text
+            val c = GregorianCalendar()
+            c.time = it.time
+            teg_field_text.text = c.get(Calendar.HOUR).toString()+":"+c.get(Calendar.MINUTE).toString()
+            tag = it._id
             Log.d("WORK",it.toString())
             for (i in it.tags)
                 controller.getTagById(i){exit->
@@ -44,9 +49,6 @@ class MessageView @JvmOverloads constructor(
                     teg_field.addView(tv)
                 }
         }
-    }
-    fun addAttachments(attachment: Array<View>){
-        for(i in attachment) attachments.addView(i)
     }
     class MessageViewHolder(val messageView: MessageView): RecyclerView.ViewHolder(messageView)
 }

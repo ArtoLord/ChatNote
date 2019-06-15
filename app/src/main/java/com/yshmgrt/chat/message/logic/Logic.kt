@@ -8,7 +8,7 @@ class Logic {
         this.messageText = message
     }
     fun getTags(): List<String> {
-        val lat = Regex(pattern = "#[A-Za-z0-9_]+")
+        val lat = Regex(pattern = "#[А-Яа-яA-Za-z0-9_]+")
         tags = lat.findAll(messageText).toList().map { it.value }
 
         return tags;
