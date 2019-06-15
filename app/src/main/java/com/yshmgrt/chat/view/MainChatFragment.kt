@@ -21,6 +21,7 @@ import com.yshmgrt.chat.data_base.dataclasses.Tag
 import com.yshmgrt.chat.message.logic.Logic
 import kotlinx.android.synthetic.main.main_chat_fragment.*
 import kotlinx.android.synthetic.main.main_chat_fragment.view.*
+import kotlinx.android.synthetic.main.tag_view.view.*
 import java.util.*
 
 class MainChatFragment : Fragment() {
@@ -29,22 +30,40 @@ class MainChatFragment : Fragment() {
     private lateinit var linearLayoutManager: LinearLayoutManager
     val messageList = mutableListOf<Long>()
 
-    fun updateMessageList(controller: Controller,tag:String = "", onUpdate:(List<Long>)->Unit){
-            controller.getAllMessageId{ exit->
+    fun updateMessageList(controller: Controller,tag:Long = -1, onUpdate:(List<Long>)->Unit){
+        if (tag == -1L){
+                controller.getAllMessageId{ exit->
+                    messageList.clear()
+                    messageList.addAll(exit)
+                    onUpdate(exit)
+            }
+        }
+        else{
+            controller.getMessagesByTagId(tag){exit->
                 messageList.clear()
                 messageList.addAll(exit)
                 onUpdate(exit)
+            }
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.main_chat_fragment, container, false)
-        adapter = MessageViewAdapter(messageList)
+        val controller = Controller(context!!)
+        adapter = MessageViewAdapter(messageList){
+            val _id = it.tag.toString().toLong()
+            updateMessageList(controller,_id){
+                adapter!!.notifyDataSetChanged()
+                view.message_edit_text.text.clear()
+                view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
+            }
+        }
         linearLayoutManager = LinearLayoutManager(context!!.applicationContext)
-        view.message_list_1.layoutManager = LinearLayoutManager(context!!.applicationContext)
+        linearLayoutManager.stackFromEnd = true
+        view.message_list_1.layoutManager = linearLayoutManager
         view.message_list_1.adapter = adapter
 
-        val controller = Controller(context!!)
+
         view.send_button.setOnClickListener {
             if (view.message_edit_text.text.isNotEmpty()){
                 val log = Logic(view.message_edit_text.text.toString()).getTags()
