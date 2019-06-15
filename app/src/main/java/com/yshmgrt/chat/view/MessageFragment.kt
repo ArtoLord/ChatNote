@@ -12,6 +12,9 @@ import com.yshmgrt.chat.message.TagView
 import kotlinx.android.synthetic.main.message_fragment.*
 import kotlinx.android.synthetic.main.message_view.view.*
 import kotlinx.android.synthetic.main.tag_view.view.*
+import ru.noties.markwon.Markwon
+import ru.noties.markwon.core.CorePlugin
+import ru.noties.markwon.image.ImagesPlugin
 import java.util.*
 
 class MessageFragment:Fragment() {
@@ -22,7 +25,12 @@ class MessageFragment:Fragment() {
         val controller = Controller(context!!)
         controller.getMessageById(_id){
                 view.teg_field.removeAllViews()
-                view.message_text.text = it.text
+
+                val  markwon = Markwon.builder(context!!)
+                .usePlugin(CorePlugin.create())
+                .usePlugin(ImagesPlugin.create(context!!))
+                .build()
+            markwon.setMarkdown(view.message_text,it.text)
                 Log.d("WORK",it.toString())
                 for (i in it.tags)
                     controller.getTagById(i){exit->

@@ -33,6 +33,11 @@ implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 testImplementation 'junit:junit:4.12'
+    implementation "ru.noties.markwon:core:${markwonVersion}"
+    implementation "ru.noties:jlatexmath-android:${mathVersion}"
+    implementation  "ru.noties.markwon:ext-latex:${markwonVersion}"
+    implementation  "ru.noties.markwon:image-okhttp:${markwonVersion}"
+    implementation  "ru.noties.markwon:syntax-highlight:${markwonVersion}"
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'

@@ -14,6 +14,16 @@ import com.yshmgrt.chat.data_base.dataclasses.Tag
 import kotlinx.android.synthetic.main.message_view.view.*
 import kotlinx.android.synthetic.main.tag_view.view.*
 import org.jetbrains.anko.childrenRecursiveSequence
+import ru.noties.jlatexmath.JLatexMathAndroid
+import ru.noties.markwon.AbstractMarkwonPlugin
+import ru.noties.markwon.Markwon
+import ru.noties.markwon.core.CorePlugin
+import ru.noties.markwon.ext.latex.JLatexMathPlugin
+import ru.noties.markwon.image.ImagesPlugin
+import ru.noties.markwon.image.okhttp.OkHttpImagesPlugin
+import ru.noties.markwon.syntax.SyntaxHighlightPlugin
+import ru.noties.prism4j.GrammarLocator
+import ru.noties.prism4j.Prism4j
 import java.util.*
 
 class MessageView @JvmOverloads constructor(
@@ -32,7 +42,12 @@ class MessageView @JvmOverloads constructor(
 
         controller.getMessageById(message){
             teg_field.removeAllViews()
-            message_text.text = it.text
+            val  markwon = Markwon.builder(context)
+                .usePlugin(CorePlugin.create())
+                .usePlugin(ImagesPlugin.create(context))
+                .build()
+
+            markwon.setMarkdown(message_text,it.text)
             val c = GregorianCalendar()
             c.time = it.time
             teg_field_text.text = c.get(Calendar.HOUR).toString()+":"+c.get(Calendar.MINUTE).toString()

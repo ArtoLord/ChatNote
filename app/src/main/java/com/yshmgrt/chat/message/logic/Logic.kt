@@ -9,7 +9,7 @@ class Logic {
     }
     fun getTags(): List<String> {
         val lat = Regex(pattern = "#[А-Яа-яA-Za-z0-9_]+")
-        tags = lat.findAll(messageText).toList().map { it.value }
+        tags = lat.findAll(messageText).toList().map { it.value }.map { it.toLowerCase() }
 
         return tags;
     }
