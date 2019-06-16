@@ -9,6 +9,10 @@
         <action android:id="@+id/action_mainChatFragment_to_notificationsFragment"
                 app:destination="@id/notificationsFragment" app:enterAnim="@anim/nav_default_enter_anim"
                 app:exitAnim="@anim/nav_default_exit_anim" app:popUpTo="@+id/mainChatFragment"/>
+        <action android:id="@+id/action_mainChatFragment_to_messageFragment"
+                app:destination="@+id/messageFragment" app:enterAnim="@anim/nav_default_enter_anim"
+                app:exitAnim="@anim/nav_default_exit_anim" app:popUpTo="@+id/mainChatFragment"
+        />
         <action android:id="@+id/action_mainChatFragment_to_bookmarksFragment" app:destination="@id/bookmarksFragment"/>
     </fragment>
     <fragment android:id="@+id/notificationsFragment" android:name="com.yshmgrt.chat.view.NotificationsFragment"
@@ -24,5 +28,11 @@
         <action android:id="@+id/action_bookmarksFragment_to_mainChatFragment" app:destination="@id/mainChatFragment"/>
         <action android:id="@+id/action_bookmarksFragment_to_notificationsFragment"
                 app:destination="@id/notificationsFragment"/>
+    </fragment>
+
+    <fragment android:id="@+id/messageFragment"
+              android:name="com.yshmgrt.chat.view.MessageFragment">
+        <argument android:name="messageId" app:argType="long" android:defaultValue="-1L"/>
+        <action android:id="@+id/action_messageFragment_self" app:destination="@id/messageFragment"/>
     </fragment>
 </navigation>

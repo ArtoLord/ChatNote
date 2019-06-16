@@ -12,7 +12,11 @@ import org.jetbrains.anko.doAsync
 
 class Helper private constructor(ctx: Context):ManagedSQLiteOpenHelper(ctx, "MainDatabase", null, 2) {
 
+
+
     override fun onUpgrade(db: SQLiteDatabase, p1: Int, p2: Int) {
+        db.dropTable(VIRTUAL_MESSAGE_TABLE, true)
+        db.dropTable(VIRTUAL_TAG_TABLE, true)
         db.dropTable("Message", true)
         db.dropTable("Attachment", true)
         db.dropTable("Tag", true)
@@ -21,6 +25,11 @@ class Helper private constructor(ctx: Context):ManagedSQLiteOpenHelper(ctx, "Mai
     }
 
     override fun onCreate(db: SQLiteDatabase) {
+        db.execSQL("CREATE VIRTUAL TABLE IF NOT EXISTS $VIRTUAL_MESSAGE_TABLE USING FTS4(text, _id UNINDEXED);")
+
+        db.execSQL("CREATE VIRTUAL TABLE IF NOT EXISTS $VIRTUAL_TAG_TABLE USING FTS4(text, _id UNINDEXED);")
+
+
         db.createTable("Message", true,
             "_id" to INTEGER+ PRIMARY_KEY+ UNIQUE,
             "text" to TEXT,
@@ -34,7 +43,7 @@ class Helper private constructor(ctx: Context):ManagedSQLiteOpenHelper(ctx, "Mai
         )
         db.createTable("Tag", true,
             "_id" to INTEGER+ PRIMARY_KEY+ UNIQUE,
-            "text" to TEXT
+            "text" to TEXT+ UNIQUE
         )
         db.createTable("Link", true,
             "_id" to INTEGER+ PRIMARY_KEY+ UNIQUE,
@@ -48,6 +57,8 @@ class Helper private constructor(ctx: Context):ManagedSQLiteOpenHelper(ctx, "Mai
     }
     companion object {
         private var instance: Helper? = null
+        val VIRTUAL_MESSAGE_TABLE = "virtual_message"
+        val VIRTUAL_TAG_TABLE = "virtual_message"
 
         @Synchronized
         fun getInstance(ctx: Context) = instance ?: Helper(ctx.applicationContext)
