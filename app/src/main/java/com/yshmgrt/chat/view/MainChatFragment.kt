@@ -105,7 +105,6 @@ class MainChatFragment : Fragment() {
 
         view.search_view_back.setOnClickListener {
             changeSearchState()
-            Toast.makeText(context, "Ok", Toast.LENGTH_SHORT).show()
         }
 
         updateMessageList(controller){
