@@ -8,4 +8,6 @@
     <string name="messages">Messages</string>
     <string name="event">Event</string>
     <string name="image">Image</string>
+    <string name="search_tags">Tags</string>
+    <string name="search_messages">Messages</string>
 </resources>

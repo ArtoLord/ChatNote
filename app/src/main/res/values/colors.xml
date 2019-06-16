@@ -10,4 +10,5 @@
     <color name="onAccent">#FFFFFF</color>
     <color name="onBackground">#000000</color>
     <color name="onSurface">#000000</color>
+    <color name="shadow">#80000000</color>
 </resources>

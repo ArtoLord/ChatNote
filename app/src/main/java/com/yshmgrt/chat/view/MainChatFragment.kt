@@ -6,28 +6,24 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.*
 import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavController
 import androidx.navigation.Navigation
-import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.yshmgrt.chat.MainActivity
 import com.yshmgrt.chat.R
 import com.yshmgrt.chat.adapters.MessageViewAdapter
 import com.yshmgrt.chat.adapters.TagViewAdapter
-import com.yshmgrt.chat.data_base.Callback
 import com.yshmgrt.chat.data_base.Controller
 import com.yshmgrt.chat.data_base.dataclasses.Attachment
-import com.yshmgrt.chat.data_base.dataclasses.Message
 import com.yshmgrt.chat.data_base.dataclasses.SQL_Message
 import com.yshmgrt.chat.data_base.dataclasses.Tag
 import com.yshmgrt.chat.message.logic.Logic
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.main_chat_fragment.*
 import kotlinx.android.synthetic.main.main_chat_fragment.view.*
-import kotlinx.android.synthetic.main.tag_view.view.*
+import kotlinx.android.synthetic.main.search_fragment.*
+import kotlinx.android.synthetic.main.search_fragment.view.*
 import org.jetbrains.anko.bundleOf
 import java.util.*
 
@@ -65,8 +61,8 @@ class MainChatFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.main_chat_fragment, container, false)
         val controller = Controller(context!!)
-        tagsRecycle = view.tags_recycler
-        tagsCard = view.tags_card
+        tagsRecycle = view.tags_search_recycler
+        tagsCard = view.search_view
         editSearch = view.search_edit_text
         adapter = MessageViewAdapter(messageList,{
             val _id = it.tag.toString().toLong()
@@ -107,15 +103,17 @@ class MainChatFragment : Fragment() {
             (activity as MainActivity).openDrawer()
         }
 
+        view.search_view_back.setOnClickListener {
+            changeSearchState()
+            Toast.makeText(context, "Ok", Toast.LENGTH_SHORT).show()
+        }
+
         updateMessageList(controller){
             adapter!!.notifyDataSetChanged()
             view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
         }
-        return view
-    }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+        return view
     }
 
     fun onSearchVisible(){
@@ -173,29 +171,32 @@ class MainChatFragment : Fragment() {
         })
     }
 
-    var searchVisable = false
+    var searchVisible = false
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.search_button){
-
-            val status = when(searchVisable){
-                true->View.GONE
-                false->View.VISIBLE
-            }
-            tagsCard.visibility = status
-
-            searchVisable = !searchVisable
-            if(searchVisable){
-                onSearchVisible()
-            }
-            else{
-                updateMessageList(Controller(context!!)){
-                    adapter!!.notifyDataSetChanged()
-                    message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
-                }
-            }
+            changeSearchState()
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun changeSearchState() {
+        val status = when(searchVisible){
+            true-> View.GONE
+            false->View.VISIBLE
+        }
+        tagsCard.visibility = status
+
+        searchVisible = !searchVisible
+        if(searchVisible){
+            onSearchVisible()
+        }
+        else{
+            updateMessageList(Controller(context!!)){
+                adapter!!.notifyDataSetChanged()
+                message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
+            }
+        }
     }
 }
