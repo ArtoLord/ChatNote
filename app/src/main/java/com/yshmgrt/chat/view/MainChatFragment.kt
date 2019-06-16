@@ -20,6 +20,8 @@ import com.yshmgrt.chat.data_base.dataclasses.Attachment
 import com.yshmgrt.chat.data_base.dataclasses.SQL_Message
 import com.yshmgrt.chat.data_base.dataclasses.Tag
 import com.yshmgrt.chat.message.logic.Logic
+import kotlinx.android.synthetic.main.bottom_drawer_fragment.*
+import kotlinx.android.synthetic.main.bottom_drawer_fragment.view.*
 import kotlinx.android.synthetic.main.main_chat_fragment.*
 import kotlinx.android.synthetic.main.main_chat_fragment.view.*
 import kotlinx.android.synthetic.main.search_fragment.*
@@ -28,6 +30,7 @@ import org.jetbrains.anko.bundleOf
 import java.util.*
 
 class MainChatFragment : Fragment() {
+    val PIC_IMAGE_REQUEST = 0
 
     var adapter: MessageViewAdapter? = null
     private lateinit var linearLayoutManager: LinearLayoutManager
@@ -60,6 +63,9 @@ class MainChatFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.main_chat_fragment, container, false)
+        (activity as MainActivity).onFragmentResult = {requestCode, resultCode, data->
+
+        }
         val controller = Controller(context!!)
         tagsRecycle = view.tags_search_recycler
         tagsCard = view.search_view
@@ -100,13 +106,17 @@ class MainChatFragment : Fragment() {
         }
 
         view.attach_button.setOnClickListener {
-            (activity as MainActivity).openDrawer()
+            (activity as MainActivity).openDrawer{
+                it.add_image.setOnClickListener{
+
+                }
+            }
         }
+
 
         view.search_view_back.setOnClickListener {
             changeSearchState()
         }
-
         updateMessageList(controller){
             adapter!!.notifyDataSetChanged()
             view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
@@ -140,7 +150,7 @@ class MainChatFragment : Fragment() {
                 messageList.addAll(a)
                 adapter!!.notifyDataSetChanged()
                 message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
-                Log.d("Work",exit.size.toString())
+
 
             }
             /*
@@ -197,5 +207,9 @@ class MainChatFragment : Fragment() {
                 message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
             }
         }
+    }
+
+    fun test(){
+        Log.d("DEBUG","It Works")
     }
 }

@@ -1,11 +1,13 @@
 package com.yshmgrt.chat
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.EditText
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +15,7 @@ import androidx.core.view.GravityCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.yshmgrt.chat.view.BottomDrawerFragment
+import com.yshmgrt.chat.view.MainChatFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.drawer_layout.*
 
@@ -48,9 +51,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun openDrawer() {
-        val bottomNavDrawer = BottomDrawerFragment()
+    fun openDrawer(onDrawerOpened:(View)->Unit) {
+        val bottomNavDrawer = BottomDrawerFragment(onDrawerOpened)
         bottomNavDrawer.show(supportFragmentManager, bottomNavDrawer.tag)
+        val manager = supportFragmentManager.findFragmentById(R.id.fragment)
+        if (manager!=null)
+            (manager as MainChatFragment).test()
+        else println("not works")
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -84,5 +91,18 @@ class MainActivity : AppCompatActivity() {
                 afterTextChanged.invoke(editable.toString())
             }
         })
+    }
+
+    lateinit var onFragmentResult:(Int,Int,Intent?)->Unit
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        try{
+            onFragmentResult(requestCode, resultCode, data)
+        }
+        catch(e:Exception){
+            e.printStackTrace()
+        }
     }
 }
