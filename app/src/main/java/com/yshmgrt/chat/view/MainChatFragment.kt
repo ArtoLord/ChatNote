@@ -82,7 +82,6 @@ class MainChatFragment : Fragment() {
         view.message_list_1.layoutManager = linearLayoutManager
         view.message_list_1.adapter = adapter
 
-
         view.send_button.setOnClickListener {
             if (view.message_edit_text.text.isNotEmpty()){
                 val log = Logic(view.message_edit_text.text.toString()).getTags()

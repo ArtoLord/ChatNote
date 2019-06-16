@@ -1,10 +1,12 @@
 package com.yshmgrt.chat.message
 
 import android.content.Context
+import android.opengl.Visibility
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.yshmgrt.chat.R
@@ -17,11 +19,11 @@ import ru.noties.markwon.core.CorePlugin
 import ru.noties.markwon.image.ImagesPlugin
 import java.util.*
 
-class MessageView @JvmOverloads constructor(
-    context: Context,
+class MessageView constructor(
+    parent: ViewGroup,
     attrs: AttributeSet? = null,
     defStyle: Int = 0
-) : LinearLayout(context, attrs, defStyle){
+) : LinearLayout(parent.context, attrs, defStyle){
     init {
         LayoutInflater.from(context)
             .inflate(R.layout.message_view, this, true)
@@ -44,6 +46,8 @@ class MessageView @JvmOverloads constructor(
             teg_field_text.text = c.get(Calendar.HOUR).toString()+":"+c.get(Calendar.MINUTE).toString()
             tag = it._id
             Log.d("WORK",it.toString())
+            if (it.tags.isEmpty())
+                tags_linear.visibility = View.GONE
             for (i in it.tags)
                 controller.getTagById(i){exit->
                     val tv = TagView(context)
