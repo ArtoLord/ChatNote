@@ -114,10 +114,6 @@ class MainChatFragment : Fragment() {
         return view
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-    }
-
     fun onSearchVisible(){
         val controller = Controller(context!!)
         val tagList = mutableListOf<Long>()

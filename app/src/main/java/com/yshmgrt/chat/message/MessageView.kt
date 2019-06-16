@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.yshmgrt.chat.R
 import com.yshmgrt.chat.data_base.Controller
 import com.yshmgrt.chat.data_base.dataclasses.Tag
+import com.yshmgrt.chat.message.attachments.IAttachment
 import kotlinx.android.synthetic.main.message_view.view.*
 import kotlinx.android.synthetic.main.tag_view.view.*
 import ru.noties.markwon.Markwon
@@ -44,8 +45,8 @@ class MessageView @JvmOverloads constructor(
             teg_field_text.text = c.get(Calendar.HOUR).toString()+":"+c.get(Calendar.MINUTE).toString()
             tag = it._id
             Log.d("WORK",it.toString())
-            for (i in it.tags)
-                controller.getTagById(i){exit->
+            for (i in it.tags) {
+                controller.getTagById(i) { exit ->
                     val tv = TagView(context)
                     tv.tag = exit._id
                     tv.tag_text.text = exit.text
@@ -54,6 +55,14 @@ class MessageView @JvmOverloads constructor(
                     )
                     teg_field.addView(tv)
                 }
+            }
+            attachments.removeAllViews()
+            for (i in it.attachment){
+                controller.getAttachmentById(i){exit->
+                    val attach = IAttachment.create(context,exit)
+                    attachments.addView(attach!!.getMessageView())
+                }
+            }
         }
     }
     class MessageViewHolder(val messageView: MessageView): RecyclerView.ViewHolder(messageView)
