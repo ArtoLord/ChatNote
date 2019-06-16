@@ -1,5 +1,6 @@
 package com.yshmgrt.chat.view
 
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -11,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.beust.klaxon.Klaxon
 import com.yshmgrt.chat.MainActivity
 import com.yshmgrt.chat.R
 import com.yshmgrt.chat.adapters.MessageViewAdapter
@@ -19,6 +21,9 @@ import com.yshmgrt.chat.data_base.Controller
 import com.yshmgrt.chat.data_base.dataclasses.Attachment
 import com.yshmgrt.chat.data_base.dataclasses.SQL_Message
 import com.yshmgrt.chat.data_base.dataclasses.Tag
+import com.yshmgrt.chat.message.attachments.IAttachment
+import com.yshmgrt.chat.message.attachments.Image
+import com.yshmgrt.chat.message.attachments.ImageAttachment
 import com.yshmgrt.chat.message.logic.Logic
 import kotlinx.android.synthetic.main.bottom_drawer_fragment.*
 import kotlinx.android.synthetic.main.bottom_drawer_fragment.view.*
@@ -30,7 +35,6 @@ import org.jetbrains.anko.bundleOf
 import java.util.*
 
 class MainChatFragment : Fragment() {
-    val PIC_IMAGE_REQUEST = 0
 
     var adapter: MessageViewAdapter? = null
     private lateinit var linearLayoutManager: LinearLayoutManager
@@ -63,9 +67,7 @@ class MainChatFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.main_chat_fragment, container, false)
-        (activity as MainActivity).onFragmentResult = {requestCode, resultCode, data->
 
-        }
         val controller = Controller(context!!)
         tagsRecycle = view.tags_search_recycler
         tagsCard = view.search_view
@@ -89,16 +91,20 @@ class MainChatFragment : Fragment() {
         view.message_list_1.adapter = adapter
 
 
+        val attachmentList = mutableListOf<Attachment>()
         view.send_button.setOnClickListener {
-            if (view.message_edit_text.text.isNotEmpty()){
+            if (view.message_edit_text.text.isNotEmpty() || attachmentList.isNotEmpty()){
+
+
                 val log = Logic(view.message_edit_text.text.toString()).getTags()
                 val tags = List(log.size){Tag(123,log[it])}
-                val attachments = listOf<Attachment>()
-                controller.sendMessage(SQL_Message(123,view.message_edit_text.text.toString(),Date().time),tags,attachments){
+                controller.sendMessage(SQL_Message(123,view.message_edit_text.text.toString(),Date().time),tags,attachmentList){
                     updateMessageList(controller){
                         adapter!!.notifyDataSetChanged()
                         view.message_edit_text.text.clear()
                         view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
+                        attachmentList.clear()
+                        view.attachments_view.removeAllViews()
                     }
                 }
 
@@ -108,7 +114,7 @@ class MainChatFragment : Fragment() {
         view.attach_button.setOnClickListener {
             (activity as MainActivity).openDrawer{
                 it.add_image.setOnClickListener{
-
+                    ImageAttachment.sendIntentToPick(activity!!)
                 }
             }
         }
@@ -121,6 +127,19 @@ class MainChatFragment : Fragment() {
             adapter!!.notifyDataSetChanged()
             view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
         }
+
+
+
+        (activity as MainActivity).onFragmentResult = {requestCode, resultCode, data->
+            if (requestCode==MainActivity.PIC_IMAGE_REQUEST){
+                val uri = data!!.data
+                val attach = Attachment(123,Attachment.IMAGE_TYPE.toString(),
+                    Klaxon().toJsonString(Image(MainActivity.getRealPathFromUri(context!!,uri as Uri))),123)
+                attachmentList.add(attach)
+                view.attachments_view.addView(IAttachment.create(context!!,attach)!!.getPreview())
+            }
+        }
+
 
         return view
     }

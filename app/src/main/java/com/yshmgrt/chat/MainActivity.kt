@@ -1,6 +1,9 @@
 package com.yshmgrt.chat
 
+import android.content.Context
 import android.content.Intent
+import android.database.Cursor
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -18,6 +21,9 @@ import com.yshmgrt.chat.view.BottomDrawerFragment
 import com.yshmgrt.chat.view.MainChatFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.drawer_layout.*
+import android.provider.MediaStore
+
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -54,10 +60,7 @@ class MainActivity : AppCompatActivity() {
     fun openDrawer(onDrawerOpened:(View)->Unit) {
         val bottomNavDrawer = BottomDrawerFragment(onDrawerOpened)
         bottomNavDrawer.show(supportFragmentManager, bottomNavDrawer.tag)
-        val manager = supportFragmentManager.findFragmentById(R.id.fragment)
-        if (manager!=null)
-            (manager as MainChatFragment).test()
-        else println("not works")
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -91,6 +94,24 @@ class MainActivity : AppCompatActivity() {
                 afterTextChanged.invoke(editable.toString())
             }
         })
+    }
+    companion object{
+        val PIC_IMAGE_REQUEST = 0
+        val PERMISSION_REQUEST = 1
+        fun getRealPathFromUri(context: Context, contentUri: Uri): String {
+            var cursor: Cursor? = null
+            try {
+                val proj = arrayOf(MediaStore.Images.Media.DATA)
+                cursor = context.getContentResolver().query(contentUri, proj, null, null, null)
+                val column_index = cursor!!.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+                cursor!!.moveToFirst()
+                return cursor!!.getString(column_index)
+            } finally {
+                if (cursor != null) {
+                    cursor!!.close()
+                }
+            }
+        }
     }
 
     lateinit var onFragmentResult:(Int,Int,Intent?)->Unit
