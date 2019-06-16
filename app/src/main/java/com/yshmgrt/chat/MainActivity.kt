@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import com.yshmgrt.chat.view.BottomDrawerFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.drawer_layout.*
 
@@ -45,6 +46,11 @@ class MainActivity : AppCompatActivity() {
             navigationController.navigate(R.id.mainChatFragment)
             drawer.closeDrawers()
         }
+    }
+
+    fun openDrawer() {
+        val bottomNavDrawer = BottomDrawerFragment()
+        bottomNavDrawer.show(supportFragmentManager, bottomNavDrawer.tag)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

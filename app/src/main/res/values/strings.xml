@@ -6,4 +6,6 @@
     <string name="bookmarks">Bookmarks</string>
     <string name="best_tags">Best tags</string>
     <string name="messages">Messages</string>
+    <string name="event">Event</string>
+    <string name="image">Image</string>
 </resources>

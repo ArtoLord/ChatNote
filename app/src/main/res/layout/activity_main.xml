@@ -44,4 +44,13 @@
             android:fitsSystemWindows="true">
         <include layout="@layout/drawer_layout"/>
     </com.google.android.material.navigation.NavigationView>
+
+    <com.google.android.material.navigation.NavigationView
+            android:id="@+id/bottom_nav_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end|bottom"
+            android:fitsSystemWindows="true">
+        <include layout="@layout/drawer_layout"/>
+    </com.google.android.material.navigation.NavigationView>
 </androidx.drawerlayout.widget.DrawerLayout>

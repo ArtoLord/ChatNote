@@ -12,6 +12,7 @@ import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.yshmgrt.chat.MainActivity
 import com.yshmgrt.chat.R
 import com.yshmgrt.chat.adapters.MessageViewAdapter
 import com.yshmgrt.chat.adapters.TagViewAdapter
@@ -31,10 +32,6 @@ import org.jetbrains.anko.bundleOf
 import java.util.*
 
 class MainChatFragment : Fragment() {
-
-
-
-
 
     var adapter: MessageViewAdapter? = null
     private lateinit var linearLayoutManager: LinearLayoutManager
@@ -105,6 +102,11 @@ class MainChatFragment : Fragment() {
 
             }
         }
+
+        view.attach_button.setOnClickListener {
+            (activity as MainActivity).openDrawer()
+        }
+
         updateMessageList(controller){
             adapter!!.notifyDataSetChanged()
             view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
