@@ -49,6 +49,8 @@ class MessageView constructor(
             Log.d("WORK",it.toString())
             if (it.tags.isEmpty())
                 tags_linear.visibility = View.GONE
+            else
+                tags_linear.visibility = View.VISIBLE
             for (i in it.tags)
                 controller.getTagById(i){exit->
                     val tv = TagView(context)
@@ -59,7 +61,6 @@ class MessageView constructor(
                     )
                     teg_field.addView(tv)
                 }
-            }
             attachments.removeAllViews()
             for (i in it.attachment){
                 controller.getAttachmentById(i){exit->
