@@ -90,7 +90,6 @@ class MainChatFragment : Fragment() {
         view.message_list_1.layoutManager = linearLayoutManager
         view.message_list_1.adapter = adapter
 
-
         val attachmentList = mutableListOf<Attachment>()
         view.send_button.setOnClickListener {
             if (view.message_edit_text.text.isNotEmpty() || attachmentList.isNotEmpty()){

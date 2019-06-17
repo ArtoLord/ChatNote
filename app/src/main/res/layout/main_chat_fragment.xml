@@ -14,8 +14,10 @@
 
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="8dp" app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/message_card"/>
+            android:layout_marginStart="8dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/message_card" app:reverseLayout="false"
+            android:layoutDirection="locale"/>
 
     <androidx.cardview.widget.CardView
             android:id="@+id/message_card"

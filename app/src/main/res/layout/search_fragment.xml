@@ -22,16 +22,26 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            android:minHeight="48dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:cardCornerRadius="24dp">
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+        >
             <EditText
                     android:id="@+id/search_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:singleLine="true"/>
+                    android:singleLine="true"
+                    android:textSize="@dimen/main_text_size"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
     <androidx.cardview.widget.CardView
@@ -40,15 +50,25 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/search_card">
+            app:layout_constraintTop_toBottomOf="@id/search_card"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:cardCornerRadius="24dp">
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/search_tags"/>
+                    android:text="@string/search_tags"
+                    android:textSize="@dimen/main_text_size"/>
             <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/tags_search_recycler"
                     android:layout_width="match_parent"
@@ -63,15 +83,25 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tags_card"
             app:layout_constraintBottom_toTopOf="@id/search_view_back"
-            app:layout_constraintVertical_bias="0">
+            app:layout_constraintVertical_bias="0"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:cardCornerRadius="24dp">
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
             <TextView
                     android:text="@string/search_messages"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/main_text_size"/>
             <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/search_message_recycler"
                     android:layout_width="match_parent"
