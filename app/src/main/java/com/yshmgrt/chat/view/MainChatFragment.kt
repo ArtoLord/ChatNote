@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.beust.klaxon.Klaxon
 import com.yshmgrt.chat.MainActivity
 import com.yshmgrt.chat.R
+import com.yshmgrt.chat.adapters.MessageRowAdapter
+import com.yshmgrt.chat.adapters.MessageRowViewHolder
 import com.yshmgrt.chat.adapters.MessageViewAdapter
 import com.yshmgrt.chat.adapters.TagViewAdapter
 import com.yshmgrt.chat.data_base.Controller
@@ -93,8 +95,6 @@ class MainChatFragment : Fragment() {
         val attachmentList = mutableListOf<Attachment>()
         view.send_button.setOnClickListener {
             if (view.message_edit_text.text.isNotEmpty() || attachmentList.isNotEmpty()){
-
-
                 val log = Logic(view.message_edit_text.text.toString()).getTags()
                 val tags = List(log.size){Tag(123,log[it])}
                 controller.sendMessage(SQL_Message(123,view.message_edit_text.text.toString(),Date().time),tags,attachmentList){
@@ -145,31 +145,35 @@ class MainChatFragment : Fragment() {
 
     fun onSearchVisible(){
         val controller = Controller(context!!)
+        val messageList = mutableListOf<Long>()
         val tagList = mutableListOf<Long>()
-        val tagAdapter = TagViewAdapter(tagList){
+
+        val tagAdapter = MessageRowAdapter(messageList){
             val _id = it.tag.toString().toLong()
-            updateMessageList(controller,_id){
-                adapter!!.notifyDataSetChanged()
-                message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
-            }
+            val bundle = bundleOf("messageId" to _id)
+            Navigation.findNavController(it).navigate(R.id.action_mainChatFragment_to_messageFragment,bundle)
+            changeSearchState()
         }
-        /*
+
         val linearTagLayoutManager = LinearLayoutManager(context!!.applicationContext)
-        linearTagLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
-        tagsRecycle.layoutManager = linearTagLayoutManager
-        tagsRecycle.adapter = tagAdapter
-        */
-        editSearch.afterTextChanged {
+        search_message_recycler.layoutManager = linearTagLayoutManager
+        search_message_recycler.adapter = tagAdapter
+        controller.getMessageByMessagePatr(search_edit_text.text.toString()){exit->
+            val a = mutableSetOf<Long>()
+            a.addAll(exit)
+
+            messageList.clear()
+            messageList.addAll(a)
+            tagAdapter.notifyDataSetChanged()
+        }
+        search_edit_text.afterTextChanged {
             controller.getMessageByMessagePatr(it){exit->
                 val a = mutableSetOf<Long>()
                 a.addAll(exit)
 
                 messageList.clear()
                 messageList.addAll(a)
-                adapter!!.notifyDataSetChanged()
-                message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
-
-
+                tagAdapter.notifyDataSetChanged()
             }
             /*
             controller.getTagByTagPart(it){exit->
@@ -218,12 +222,6 @@ class MainChatFragment : Fragment() {
         searchVisible = !searchVisible
         if(searchVisible){
             onSearchVisible()
-        }
-        else{
-            updateMessageList(Controller(context!!)){
-                adapter!!.notifyDataSetChanged()
-                message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
-            }
         }
     }
 

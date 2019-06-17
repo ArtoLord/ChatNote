@@ -19,6 +19,8 @@ import ru.noties.markwon.Markwon
 import ru.noties.markwon.core.CorePlugin
 import ru.noties.markwon.image.ImagesPlugin
 import java.util.*
+import java.text.SimpleDateFormat
+
 
 class MessageView constructor(
     parent: ViewGroup,
@@ -44,7 +46,8 @@ class MessageView constructor(
             markwon.setMarkdown(message_text,it.text)
             val c = GregorianCalendar()
             c.time = it.time
-            teg_field_text.text = c.get(Calendar.HOUR).toString()+":"+c.get(Calendar.MINUTE).toString()
+            val dateFormat = SimpleDateFormat("HH:mm")
+            teg_field_text.text = dateFormat.format(c.time)
             tag = it._id
             Log.d("WORK",it.toString())
             if (it.tags.isEmpty())
