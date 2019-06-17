@@ -135,7 +135,7 @@ class MainChatFragment : Fragment() {
                 val attach = Attachment(123,Attachment.IMAGE_TYPE.toString(),
                     Klaxon().toJsonString(Image(MainActivity.getRealPathFromUri(context!!,uri as Uri))),123)
                 attachmentList.add(attach)
-                view.attachments_view.addView(IAttachment.create(context!!,attach)!!.getPreview())
+                view.attachments_view.addView(IAttachment.create(attach)!!.getPreview(context!!))
             }
         }
 

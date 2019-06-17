@@ -26,7 +26,7 @@ class MessageRowAdapter(val messages:List<Long>,val onClick:(View)->Unit): Recyc
         val id = messages[position]
         controller.getMessageById(id){
             holder.itemView.tag = id
-            holder.itemView.message_text.text = it.text
+            holder.itemView.message_text.text = it.text.replace("\n"," ").replace(Regex("[ ]+")," ")
             val c = GregorianCalendar()
             c.time = it.time
             val dateFormat = SimpleDateFormat("d MMMM yyyy, HH:mm")

@@ -42,8 +42,8 @@ class MessageFragment:Fragment() {
             view.attachments.removeAllViews()
             for (i in it.attachment){
                 controller.getAttachmentById(i){exit->
-                    val attach = IAttachment.create(context!!,exit)
-                    view.attachments.addView(attach!!.getMessageView())
+                    val attach = IAttachment.create(exit)
+                    view.attachments.addView(attach!!.getMessageView(context!!))
                 }
             }
 

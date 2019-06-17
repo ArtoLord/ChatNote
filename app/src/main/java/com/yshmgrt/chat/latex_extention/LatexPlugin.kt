@@ -182,7 +182,7 @@ return Builder(textSize)
 }
 
  fun makeDestination(latex:String):String {
-return "$SCHEME$latex"
+return "$SCHEME://$latex"
 }
 
  val SCHEME = "jlatexmath"

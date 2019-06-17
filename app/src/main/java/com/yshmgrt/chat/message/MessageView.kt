@@ -18,6 +18,7 @@ import kotlinx.android.synthetic.main.message_view.view.*
 import kotlinx.android.synthetic.main.tag_view.view.*
 import ru.noties.markwon.Markwon
 import ru.noties.markwon.core.CorePlugin
+import ru.noties.markwon.ext.latex.JLatexMathPlugin
 import ru.noties.markwon.image.ImagesPlugin
 import java.util.*
 import java.text.SimpleDateFormat
@@ -41,7 +42,7 @@ class MessageView constructor(
             teg_field.removeAllViews()
             val  markwon = Markwon.builder(context)
                 .usePlugin(CorePlugin.create())
-                .usePlugin(LatexPlugin.create(36F))
+                .usePlugin(JLatexMathPlugin.create(36F))
                 .usePlugin(ImagesPlugin.create(context))
                 .build()
 
@@ -69,8 +70,8 @@ class MessageView constructor(
             attachments.removeAllViews()
             for (i in it.attachment){
                 controller.getAttachmentById(i){exit->
-                    val attach = IAttachment.create(context,exit)
-                    attachments.addView(attach!!.getMessageView())
+                    val attach = IAttachment.create(exit)
+                    attachments.addView(attach!!.getMessageView(context))
                 }
             }
         }
