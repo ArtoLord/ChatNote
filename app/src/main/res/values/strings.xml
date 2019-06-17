@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">ChatNote</string>
+    <string name="search">Search</string>
+    <string name="settings">Settings</string>
+    <string name="notifies">Notifies</string>
+    <string name="bookmarks">Bookmarks</string>
+    <string name="best_tags">Best tags</string>
+    <string name="messages">Messages</string>
+    <string name="event">Event</string>
+    <string name="image">Image</string>
+    <string name="search_tags">Tags</string>
+    <string name="search_messages">Messages</string>
 </resources>
