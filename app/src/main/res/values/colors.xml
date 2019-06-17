@@ -11,4 +11,5 @@
     <color name="onBackground">#737373</color>
     <color name="onSurface">#737373</color>
     <color name="shadow">#80000000</color>
+    <color name="surfaceDark">#EBEBEB</color>
 </resources>
