@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.yshmgrt.chat.R
 import com.yshmgrt.chat.data_base.Controller
 import com.yshmgrt.chat.data_base.dataclasses.Tag
+import com.yshmgrt.chat.message.attachments.IAttachment
 import kotlinx.android.synthetic.main.message_view.view.*
 import kotlinx.android.synthetic.main.tag_view.view.*
 import ru.noties.markwon.Markwon
@@ -58,6 +59,14 @@ class MessageView constructor(
                     )
                     teg_field.addView(tv)
                 }
+            }
+            attachments.removeAllViews()
+            for (i in it.attachment){
+                controller.getAttachmentById(i){exit->
+                    val attach = IAttachment.create(context,exit)
+                    attachments.addView(attach!!.getMessageView())
+                }
+            }
         }
     }
     class MessageViewHolder(val messageView: MessageView): RecyclerView.ViewHolder(messageView)

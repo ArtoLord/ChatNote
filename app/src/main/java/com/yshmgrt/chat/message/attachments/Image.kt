@@ -11,7 +11,7 @@ import android.widget.LinearLayout
 import com.yshmgrt.chat.R
 import kotlinx.android.synthetic.main.image_attachment.view.*
 
-class Image:LinearLayout{
+class ImageView:LinearLayout{
     @JvmOverloads
     constructor(
         context: Context,
@@ -34,3 +34,5 @@ class Image:LinearLayout{
         source.setImageDrawable(drawable)
     }
 }
+
+data class Image(val path:String)

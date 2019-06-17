@@ -1,11 +1,16 @@
 package com.yshmgrt.chat
 
+import android.content.Context
+import android.content.Intent
+import android.database.Cursor
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.EditText
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -13,8 +18,12 @@ import androidx.core.view.GravityCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.yshmgrt.chat.view.BottomDrawerFragment
+import com.yshmgrt.chat.view.MainChatFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.drawer_layout.*
+import android.provider.MediaStore
+
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -48,9 +57,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun openDrawer() {
-        val bottomNavDrawer = BottomDrawerFragment()
+    fun openDrawer(onDrawerOpened:(View)->Unit) {
+        val bottomNavDrawer = BottomDrawerFragment(onDrawerOpened)
         bottomNavDrawer.show(supportFragmentManager, bottomNavDrawer.tag)
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -84,5 +94,36 @@ class MainActivity : AppCompatActivity() {
                 afterTextChanged.invoke(editable.toString())
             }
         })
+    }
+    companion object{
+        val PIC_IMAGE_REQUEST = 0
+        val PERMISSION_REQUEST = 1
+        fun getRealPathFromUri(context: Context, contentUri: Uri): String {
+            var cursor: Cursor? = null
+            try {
+                val proj = arrayOf(MediaStore.Images.Media.DATA)
+                cursor = context.getContentResolver().query(contentUri, proj, null, null, null)
+                val column_index = cursor!!.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+                cursor!!.moveToFirst()
+                return cursor!!.getString(column_index)
+            } finally {
+                if (cursor != null) {
+                    cursor!!.close()
+                }
+            }
+        }
+    }
+
+    lateinit var onFragmentResult:(Int,Int,Intent?)->Unit
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        try{
+            onFragmentResult(requestCode, resultCode, data)
+        }
+        catch(e:Exception){
+            e.printStackTrace()
+        }
     }
 }

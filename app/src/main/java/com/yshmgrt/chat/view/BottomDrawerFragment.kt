@@ -7,8 +7,10 @@ import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.yshmgrt.chat.R
 
-class BottomDrawerFragment : BottomSheetDialogFragment() {
+class BottomDrawerFragment(val onCreated:(View)->Unit) : BottomSheetDialogFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.bottom_drawer_fragment, container, false)
+        val view = inflater.inflate(R.layout.bottom_drawer_fragment, container, false)
+        onCreated(view)
+        return view
     }
 }
