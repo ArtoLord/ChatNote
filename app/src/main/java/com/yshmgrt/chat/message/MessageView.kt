@@ -35,6 +35,10 @@ class MessageView constructor(
     fun setThisMessage(message:Long, controller: Controller, tagOnClick:(View)->Unit){
 
         controller.getMessageById(message){
+            message_text.visibility = if (it.text == "")
+                View.GONE
+            else View.VISIBLE
+
             teg_field.removeAllViews()
             val  markwon = Markwon.builder(context)
                 .usePlugin(CorePlugin.create())
