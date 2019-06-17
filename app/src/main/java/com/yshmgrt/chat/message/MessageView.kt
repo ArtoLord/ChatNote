@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.yshmgrt.chat.R
 import com.yshmgrt.chat.data_base.Controller
 import com.yshmgrt.chat.data_base.dataclasses.Tag
+import com.yshmgrt.chat.latex_extention.LatexPlugin
 import com.yshmgrt.chat.message.attachments.IAttachment
 import kotlinx.android.synthetic.main.message_view.view.*
 import kotlinx.android.synthetic.main.tag_view.view.*
@@ -40,6 +41,7 @@ class MessageView constructor(
             teg_field.removeAllViews()
             val  markwon = Markwon.builder(context)
                 .usePlugin(CorePlugin.create())
+                .usePlugin(LatexPlugin.create(36F))
                 .usePlugin(ImagesPlugin.create(context))
                 .build()
 
