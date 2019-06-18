@@ -23,6 +23,7 @@ import com.yshmgrt.chat.data_base.Controller
 import com.yshmgrt.chat.data_base.dataclasses.Attachment
 import com.yshmgrt.chat.data_base.dataclasses.SQL_Message
 import com.yshmgrt.chat.data_base.dataclasses.Tag
+import com.yshmgrt.chat.message.TagView
 import com.yshmgrt.chat.message.attachments.IAttachment
 import com.yshmgrt.chat.message.attachments.Image
 import com.yshmgrt.chat.message.attachments.ImageAttachment
@@ -33,16 +34,19 @@ import kotlinx.android.synthetic.main.main_chat_fragment.*
 import kotlinx.android.synthetic.main.main_chat_fragment.view.*
 import kotlinx.android.synthetic.main.search_fragment.*
 import kotlinx.android.synthetic.main.search_fragment.view.*
+import kotlinx.android.synthetic.main.tag_view.view.*
 import org.jetbrains.anko.bundleOf
 import java.util.*
 
 class MainChatFragment : Fragment() {
 
+    var tagList = mutableSetOf<Long>()
+
     var adapter: MessageViewAdapter? = null
     private lateinit var linearLayoutManager: LinearLayoutManager
     val messageList = mutableListOf<Long>()
-    fun updateMessageList(controller: Controller,tag:Long = -1, onUpdate:(List<Long>)->Unit){
-        if (tag == -1L){
+    fun updateMessageList(controller: Controller,tag:Collection<Long>  = emptyList(), onUpdate:(Collection<Long>)->Unit){
+        if (tag.isEmpty()){
                 controller.getAllMessageId{ exit->
                     messageList.clear()
                     messageList.addAll(exit)
@@ -50,10 +54,33 @@ class MainChatFragment : Fragment() {
             }
         }
         else{
-            controller.getMessagesByTagId(tag){exit->
+            controller.getMessagesByTags(tag.toList()){exit->
+                Log.d("TAGS_DEBUG", exit.size.toString())
                 messageList.clear()
                 messageList.addAll(exit)
                 onUpdate(exit)
+            }
+        }
+    }
+
+    fun updateTagProvider(view:View, controller: Controller){
+        view.tag_provider.removeAllViews()
+        for (i in tagList){
+            controller.getTagById(i){
+                val tv = TagView(context!!)
+                tv.tag = it._id
+                tv.tag_text.text = it.text
+                tv.close_button.visibility = View.VISIBLE
+                tv.setOnClickListener {_->
+                    val mlist = tagList.toMutableList()
+                    mlist.remove(it._id)
+                    tagList = mlist.toMutableSet()
+                    updateTagProvider(view,controller)
+                    updateMessageList(controller,mlist){
+                        adapter!!.notifyDataSetChanged()
+                    }
+                }
+                view.tag_provider.addView(tv)
             }
         }
     }
@@ -71,12 +98,15 @@ class MainChatFragment : Fragment() {
         val view = inflater.inflate(R.layout.main_chat_fragment, container, false)
 
         val controller = Controller(context!!)
+
         tagsRecycle = view.tags_search_recycler
         tagsCard = view.search_view
         editSearch = view.search_edit_text
         adapter = MessageViewAdapter(messageList,{
             val _id = it.tag.toString().toLong()
-            updateMessageList(controller,_id){
+            tagList.add(_id)
+            updateTagProvider(view,controller)
+            updateMessageList(controller, tagList){
                 adapter!!.notifyDataSetChanged()
                 view.message_edit_text.text.clear()
                 view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
@@ -97,7 +127,7 @@ class MainChatFragment : Fragment() {
             if (view.message_edit_text.text.isNotEmpty() || attachmentList.isNotEmpty()){
                 val log = Logic(view.message_edit_text.text.toString()).getTags()
                 val tags = List(log.size){Tag(123,log[it])}
-                controller.sendMessage(SQL_Message(123,view.message_edit_text.text.toString(),Date().time),tags,attachmentList){
+                controller.sendMessage(SQL_Message(123,view.message_edit_text.text.toString(),Date().time,SQL_Message.USER_TYPE),tags,attachmentList){
                     updateMessageList(controller){
                         adapter!!.notifyDataSetChanged()
                         view.message_edit_text.text.clear()

@@ -1,5 +1,6 @@
 package com.yshmgrt.chat.adapters
 
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -12,7 +13,7 @@ class MessageViewAdapter(val messageIds:List<Long>,
     lateinit var controller:Controller
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): MessageView.MessageViewHolder {
         controller = Controller(parent.context)
-        val view = MessageView(parent)
+        val view = MessageView(parent.context)
         view.layoutParams = RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         return MessageView.MessageViewHolder(view)
     }
@@ -22,6 +23,7 @@ class MessageViewAdapter(val messageIds:List<Long>,
 
     override fun onBindViewHolder(viewHolder: MessageView.MessageViewHolder, position: Int) {
         val id = messageIds[position]
+        Log.d("WORK",id.toString())
         viewHolder.messageView.setThisMessage(id,controller,tagOnClick)
         viewHolder.messageView.setOnClickListener {
             messageOnClick(it)

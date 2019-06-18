@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -12,6 +12,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/tag_text"
+            android:text="Hello world"
+    />
+    <ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content"
+                 android:src="@drawable/ic_clear_black_18dp"
+                 android:id="@+id/close_button"
+                 android:visibility="gone"
+                 android:background="#00EBEBEB"
+                 android:layout_gravity="center"
+                 android:layout_margin="4dp"
     />
 
 </LinearLayout>

@@ -25,10 +25,10 @@ import java.text.SimpleDateFormat
 
 
 class MessageView constructor(
-    parent: ViewGroup,
+    context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0
-) : LinearLayout(parent.context, attrs, defStyle){
+) : LinearLayout(context, attrs, defStyle){
     init {
         LayoutInflater.from(context)
             .inflate(R.layout.message_view, this, true)
@@ -39,6 +39,8 @@ class MessageView constructor(
     fun setThisMessage(message:Long, controller: Controller, tagOnClick:(View)->Unit){
 
         controller.getMessageById(message){
+            Log.d("DEBUG",it.toString())
+
             message_text.visibility = if (it.text == "")
                 View.GONE
             else View.VISIBLE
