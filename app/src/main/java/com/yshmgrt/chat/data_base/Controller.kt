@@ -308,6 +308,22 @@ class Controller(private val ctx: Context):IController {
         }
     }
 
+
+    fun resendMessage(_id: Long, time:Long){
+        getMessageById(_id){message->
+            addMessage(SQL_Message(123,message.text,time,SQL_Message.SYSTEM_TYPE)){message_id->
+                for (i in message.tags){
+                    addLink(Link(123,message_id,i))
+                }
+                for (i in message.attachment){
+                    getAttachmentById(i){attach->
+                        addAttachment(Attachment(123,attach.type,attach.link,message_id)){}
+                    }
+                }
+            }
+        }
+    }
+
         fun getMessagesByTagId(_id: Long, callback: Callback<List<Long>>){
         try{
             callback.onBegin()
