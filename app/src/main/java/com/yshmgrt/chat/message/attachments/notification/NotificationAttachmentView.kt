@@ -17,6 +17,6 @@ class NotificationAttachmentView(context : Context) : LinearLayout(context) {
         val c = GregorianCalendar()
         c.timeInMillis = notification.time
         time.text = SimpleDateFormat("HH:mm").format(c.time)
-        date.text = SimpleDateFormat("dd MMMMMMMMMM, yyyy").format(c.time)
+        date.text = SimpleDateFormat("dd MM, yyyy").format(c.time)
     }
 }

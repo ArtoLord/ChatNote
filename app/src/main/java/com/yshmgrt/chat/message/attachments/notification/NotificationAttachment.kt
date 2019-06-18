@@ -17,7 +17,7 @@ class NotificationAttachment(val attachment: Attachment) : IAttachment {
         fun create(notification: Notification) : Attachment {
             return Attachment(
                 1,
-                "notification",
+                Attachment.EVENT_TYPE.toString(),
                 Klaxon().toJsonString(notification),
                 1
             )
