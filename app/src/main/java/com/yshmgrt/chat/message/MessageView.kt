@@ -7,9 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.yshmgrt.chat.R
 import com.yshmgrt.chat.data_base.Controller
+import com.yshmgrt.chat.data_base.dataclasses.SQL_Message
 import com.yshmgrt.chat.data_base.dataclasses.Tag
 import com.yshmgrt.chat.latex_extention.LatexPlugin
 import com.yshmgrt.chat.message.attachments.IAttachment
@@ -39,6 +41,12 @@ class MessageView constructor(
 
         controller.getMessageById(message){
             Log.d("DEBUG",it.toString())
+            if (it.type == SQL_Message.SYSTEM_TYPE){
+                (notification_card.layoutParams as ConstraintLayout.LayoutParams).horizontalBias = 0f
+            }
+            else{
+                (notification_card.layoutParams as ConstraintLayout.LayoutParams).horizontalBias = 1f
+            }
 
             message_text.visibility = if (it.text == "")
                 View.GONE
