@@ -1,12 +1,16 @@
 package com.yshmgrt.chat.view
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.*
+import android.widget.DatePicker
 import android.widget.EditText
+import android.widget.TimePicker
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
@@ -148,10 +152,27 @@ class MainChatFragment : Fragment() {
                     ImageAttachment.sendIntentToPick(activity!!)
                 }
                 it.add_event.setOnClickListener{
-                    Log.d("DEBUG1", "OOOO")
-                    val attach = NotificationAttachment.create(Notification(12343L))
-                    attachmentList.add(attach)
-                    view.attachments_view.addView(IAttachment.create(attach)!!.getPreview(context!!))
+                    val today = Calendar.getInstance()
+                    DatePickerDialog(context!!,
+                        DatePickerDialog.OnDateSetListener { _, y, m, d ->
+                            today[Calendar.YEAR] = y
+                            today[Calendar.MONTH] = m
+                            today[Calendar.DAY_OF_MONTH] = d
+                            TimePickerDialog(context,
+                                TimePickerDialog.OnTimeSetListener { _, hh, mm ->
+                                    today[Calendar.HOUR_OF_DAY] = hh
+                                    today[Calendar.MINUTE] = mm
+                                    val attach = NotificationAttachment.create(Notification(today.timeInMillis))
+                                    attachmentList.add(attach)
+                                    view.attachments_view.addView(IAttachment.create(attach)!!.getPreview(context!!))
+                                },
+                                today[Calendar.HOUR_OF_DAY],
+                                today[Calendar.MINUTE],
+                                true).show()
+                        },
+                        today[Calendar.YEAR],
+                        today[Calendar.MONTH],
+                        today[Calendar.DAY_OF_MONTH]).show()
                 }
             }
         }
