@@ -39,7 +39,7 @@ class Controller(private val ctx: Context):IController {
                                                             return columns.getValue("_id").toString().toLong()
                                                         }
                                                     })
-                                                    callback.onEnd(Message(sqlMessage._id,sqlMessage.text,attachmentList,tagList,
+                                                    callback.onEnd(Message(sqlMessage._id,sqlMessage.text, sqlMessage.type, attachmentList,tagList,
                                                         Date(sqlMessage.time)))
 
                                                 }
@@ -62,12 +62,37 @@ class Controller(private val ctx: Context):IController {
         })
     }
 
+    fun getMessagesByTags(tags:List<Long>, onEnd: (Collection<Long>) -> Unit){
+        ctx.database.use {
+            var messageList = mutableSetOf<Long>()
+            getAllMessageId {
+                messageList.addAll(it)
+                for (i in 0 until tags.size) {
+                    select("Link", "messageId")
+                        .whereArgs("tagId = ${tags[i]}")
+                        .exec {
+                            messageList = messageList.intersect(parseList(object :MapRowParser<Long>{
+                                override fun parseRow(columns: Map<String, Any?>): Long {
+                                    return columns.getValue("messageId").toString().toLong()
+                                }
+                            })).toMutableSet()
+                            if(i==tags.size-1){
+                                onEnd(messageList)
+                            }
+                        }
+                }
+            }
+
+        }
+    }
+
     private fun addMessage(message: SQL_Message, onEnd: (Long) -> Unit){
             ctx.database.use {
                 val exit = insert(
                     "Message",
                     "text" to message.text,
-                    "time" to message.time
+                    "time" to message.time,
+                    "type" to message.type
                 )
                 onEnd(exit)
                 insert(
@@ -254,18 +279,15 @@ class Controller(private val ctx: Context):IController {
             update(
                 "Message",
                 "text" to message.text,
-                "time" to message.time
+                "time" to message.time,
+                "type" to message.type
             )
                 .whereArgs("_id = {id}", "id" to message._id)
                 .exec()
         }
     }
-    private fun createSQL_message(message: Message): SQL_Message {
-        return SQL_Message(message._id, message.text, message.time.time)
-    }
-
     fun sendMessage(message:SQL_Message, tags:List<Tag>, attachments:List<Attachment>,onSended:(Boolean)->Unit) {
-        addMessage(message) { it ->
+        addMessage(message) {
             Log.d("WORK", "end")
             val message_id = it
             for (i in tags) {

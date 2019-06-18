@@ -10,7 +10,7 @@ import com.yshmgrt.chat.data_base.dataclasses.Tag
 import org.jetbrains.anko.db.*
 import org.jetbrains.anko.doAsync
 
-class Helper private constructor(ctx: Context):ManagedSQLiteOpenHelper(ctx, "MainDatabase", null, 2) {
+class Helper private constructor(ctx: Context):ManagedSQLiteOpenHelper(ctx, "MainDatabase", null, 1) {
 
 
 
@@ -33,7 +33,8 @@ class Helper private constructor(ctx: Context):ManagedSQLiteOpenHelper(ctx, "Mai
         db.createTable("Message", true,
             "_id" to INTEGER+ PRIMARY_KEY+ UNIQUE,
             "text" to TEXT,
-            "time" to INTEGER
+            "time" to INTEGER,
+            "type" to INTEGER
             )
         db.createTable("Attachment", true,
             "_id" to INTEGER+ PRIMARY_KEY+ UNIQUE,

@@ -24,12 +24,12 @@ import com.yshmgrt.chat.R
 class AppGlideModule : AppGlideModule()
 
 
-class ImageAttachment(val context: Context, attachment: Attachment) :IAttachment{
+class ImageAttachment( attachment: Attachment) :IAttachment{
 
     private val image:Image = Klaxon().parse<Image>(attachment.link)!!
 
 
-    override fun getMessageView(): View {
+    override fun getMessageView(context:Context): View {
         val view = ImageView(context)
         GlideApp
             .with(context)
@@ -38,7 +38,7 @@ class ImageAttachment(val context: Context, attachment: Attachment) :IAttachment
             .into(view.source)
         return view
     }
-    override fun getPreview(): View {
+    override fun getPreview(context:Context): View {
         val a = com.yshmgrt.chat.message.attachments.AppGlideModule()
         val view = ImageView(context)
         GlideApp

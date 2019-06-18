@@ -24,13 +24,18 @@ class MessageFragment:Fragment() {
         val controller = Controller(context!!)
         controller.getMessageById(_id){
                 view.teg_field.removeAllViews()
-
-                val  markwon = Markwon.builder(context!!)
-                .usePlugin(CorePlugin.create())
-                .usePlugin(ImagesPlugin.create(context!!))
-                .build()
-            markwon.setMarkdown(view.message_text,it.text)
+            if(it.text.isEmpty()) view.message_text.visibility = View.GONE
+            else {
+                view.message_text.visibility = View.VISIBLE
+                val markwon = Markwon.builder(context!!)
+                    .usePlugin(CorePlugin.create())
+                    .usePlugin(ImagesPlugin.create(context!!))
+                    .build()
+                markwon.setMarkdown(view.message_text, it.text)
+            }
                 Log.d("WORK",it.toString())
+            if (it.tags.isEmpty()) view.teg_field.visibility = View.GONE
+            else view.teg_field.visibility = View.VISIBLE
                 for (i in it.tags) {
                     controller.getTagById(i) { exit ->
                         val tv = TagView(context!!)
@@ -42,8 +47,8 @@ class MessageFragment:Fragment() {
             view.attachments.removeAllViews()
             for (i in it.attachment){
                 controller.getAttachmentById(i){exit->
-                    val attach = IAttachment.create(context!!,exit)
-                    view.attachments.addView(attach!!.getMessageView())
+                    val attach = IAttachment.create(exit)
+                    view.attachments.addView(attach!!.getMessageView(context!!))
                 }
             }
 
