@@ -16,7 +16,7 @@ class Controller(private val ctx: Context):IController {
                 ctx.database.use {
                     select("Message")
                         .whereArgs(
-                            "_id = {id}",
+                            "_id = {id} AND time <= ${Date().time}",
                             "id" to _id
                         )
                         .exec {
@@ -130,6 +130,7 @@ class Controller(private val ctx: Context):IController {
         try {
             ctx.database.use {
                 select("Message","_id")
+                    .whereArgs("time <= ${Date().time}")
                     .exec {
                         lambda(
                             parseList(object : MapRowParser<Long> {

@@ -196,7 +196,14 @@ class MainChatFragment : Fragment() {
             messageList.addAll(a)
             tagAdapter.notifyDataSetChanged()
         }
+        if (search_edit_text.text.toString().isEmpty()){
+            messages_card.visibility = View.GONE
+        }
+        else{
+            messages_card.visibility = View.VISIBLE
+        }
         search_edit_text.afterTextChanged {
+            messages_card.visibility = View.VISIBLE
             controller.getMessageByMessagePatr(it){exit->
                 val a = mutableSetOf<Long>()
                 a.addAll(exit)
