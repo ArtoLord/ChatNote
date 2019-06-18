@@ -9,6 +9,7 @@ import com.yshmgrt.chat.message.attachments.notification.NotificationAttachment
 interface IAttachment {
     fun getMessageView(context: Context):View
     fun getPreview(context: Context):View
+    fun onSended(context: Context)
     companion object {
         fun create(attachment: Attachment): IAttachment? {
             return when (attachment.type.toInt()) {

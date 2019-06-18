@@ -5,6 +5,7 @@ import android.util.Log
 import com.yshmgrt.chat.data_base.Helper.Helper
 import com.yshmgrt.chat.data_base.dataclasses.*
 import com.yshmgrt.chat.database
+import com.yshmgrt.chat.message.attachments.IAttachment
 import org.jetbrains.anko.db.*
 import org.jetbrains.anko.doAsync
 import java.util.*
@@ -16,7 +17,7 @@ class Controller(private val ctx: Context):IController {
                 ctx.database.use {
                     select("Message")
                         .whereArgs(
-                            "_id = {id}",
+                            "_id = {id} AND time <= ${Date().time}",
                             "id" to _id
                         )
                         .exec {
@@ -130,6 +131,7 @@ class Controller(private val ctx: Context):IController {
         try {
             ctx.database.use {
                 select("Message","_id")
+                    .whereArgs("time <= ${Date().time}")
                     .exec {
                         lambda(
                             parseList(object : MapRowParser<Long> {
@@ -286,8 +288,8 @@ class Controller(private val ctx: Context):IController {
                 .exec()
         }
     }
-    fun sendMessage(message:SQL_Message, tags:List<Tag>, attachments:List<Attachment>,onSended:(Boolean)->Unit) {
-        addMessage(message) {
+    fun sendMessage(message:SQL_Message, tags:List<Tag>, attachments:List<Attachment>,context: Context,onSended:(Boolean)->Unit) {
+        addMessage(message) { it ->
             Log.d("WORK", "end")
             val message_id = it
             for (i in tags) {
@@ -298,7 +300,9 @@ class Controller(private val ctx: Context):IController {
             }
             for (a in attachments) {
 
-                addAttachment(Attachment(123, a.type, a.link, message_id)) {}
+                addAttachment(Attachment(123, a.type, a.link, message_id)) {_id->
+                    IAttachment.create(Attachment(_id, a.type, a.link, message_id))!!.onSended(context)
+                }
             }
             onSended(true)
         }

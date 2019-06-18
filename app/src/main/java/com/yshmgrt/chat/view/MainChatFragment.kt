@@ -129,7 +129,7 @@ class MainChatFragment : Fragment() {
             if (view.message_edit_text.text.isNotEmpty() || attachmentList.isNotEmpty()){
                 val log = Logic(view.message_edit_text.text.toString()).getTags()
                 val tags = List(log.size){Tag(123,log[it])}
-                controller.sendMessage(SQL_Message(123,view.message_edit_text.text.toString(),Date().time,SQL_Message.USER_TYPE),tags,attachmentList){
+                controller.sendMessage(SQL_Message(123,view.message_edit_text.text.toString(),Date().time,SQL_Message.USER_TYPE),tags,attachmentList,context!!){
                     updateMessageList(controller){
                         adapter!!.notifyDataSetChanged()
                         view.message_edit_text.text.clear()
@@ -204,7 +204,14 @@ class MainChatFragment : Fragment() {
             messageList.addAll(a)
             tagAdapter.notifyDataSetChanged()
         }
+        if (search_edit_text.text.toString().isEmpty()){
+            messages_card.visibility = View.GONE
+        }
+        else{
+            messages_card.visibility = View.VISIBLE
+        }
         search_edit_text.afterTextChanged {
+            messages_card.visibility = View.VISIBLE
             controller.getMessageByMessagePatr(it){exit->
                 val a = mutableSetOf<Long>()
                 a.addAll(exit)
