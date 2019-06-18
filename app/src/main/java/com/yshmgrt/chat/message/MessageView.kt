@@ -1,7 +1,5 @@
 package com.yshmgrt.chat.message
 
-import android.content.Context
-import android.opengl.Visibility
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
@@ -48,7 +46,7 @@ class MessageView constructor(
             markwon.setMarkdown(message_text,it.text)
             val c = GregorianCalendar()
             c.time = it.time
-            teg_field_text.text = c.get(Calendar.HOUR).toString()+":"+c.get(Calendar.MINUTE).toString()
+            message_time.text = c.get(Calendar.HOUR).toString()+":"+c.get(Calendar.MINUTE).toString()
             tag = it._id
             Log.d("WORK",it.toString())
             if (it.tags.isEmpty())

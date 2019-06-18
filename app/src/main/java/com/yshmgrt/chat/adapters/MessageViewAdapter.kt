@@ -14,6 +14,7 @@ class MessageViewAdapter(val messageIds:List<Long>,
         controller = Controller(parent.context)
         val view = MessageView(parent)
         view.layoutParams = RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        view.layoutParams.width = parent.width
         return MessageView.MessageViewHolder(view)
     }
     override fun getItemCount(): Int {
