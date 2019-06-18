@@ -11,7 +11,7 @@ class NotificationAttachment(val attachment: Attachment) : IAttachment {
 
     override fun getMessageView(context : Context) = NotificationAttachmentView(context).apply { setContent(notification) }
 
-    override fun getPreview(context : Context) = getMessageView(context)
+    override fun getPreview(context : Context) = NotificationAttachmentView(context, true).apply { setContent(notification) }
 
     companion object {
         fun create(notification: Notification) : Attachment {
