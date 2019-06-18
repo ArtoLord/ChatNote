@@ -22,7 +22,8 @@ import com.yshmgrt.chat.view.MainChatFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.drawer_layout.*
 import android.provider.MediaStore
-
+import androidx.navigation.Navigation
+import org.jetbrains.anko.bundleOf
 
 
 class MainActivity : AppCompatActivity() {
@@ -98,6 +99,8 @@ class MainActivity : AppCompatActivity() {
     companion object{
         val PIC_IMAGE_REQUEST = 0
         val PERMISSION_REQUEST = 1
+        val NOTIFICATION_CLICKED = 2
+        val CHANNEL_ID = "ChatNote"
         fun getRealPathFromUri(context: Context, contentUri: Uri): String {
             var cursor: Cursor? = null
             try {
@@ -120,7 +123,16 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         try{
-            onFragmentResult(requestCode, resultCode, data)
+            if (requestCode == NOTIFICATION_CLICKED){
+
+                val _id = data!!.extras["messageId"].toString().toLong()
+                val bundle = bundleOf("messageId" to _id)
+
+                navigationController.navigate(R.id.action_mainChatFragment_to_messageFragment,bundle)
+            }
+            else {
+                onFragmentResult(requestCode, resultCode, data)
+            }
         }
         catch(e:Exception){
             e.printStackTrace()
