@@ -22,6 +22,7 @@ import com.yshmgrt.chat.view.MainChatFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.drawer_layout.*
 import android.provider.MediaStore
+import android.util.Log
 import androidx.navigation.Navigation
 import org.jetbrains.anko.bundleOf
 
@@ -36,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+
         drawerToggle = ActionBarDrawerToggle(this, drawer, R.string.nav_app_bar_open_drawer_description, R.string.nav_app_bar_navigate_up_description)
         drawer.addDrawerListener(drawerToggle)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
@@ -43,6 +45,14 @@ class MainActivity : AppCompatActivity() {
 
         val host = fragment as NavHostFragment
         navigationController = host.navController
+
+        if (intent.action== NOTIFICATION_CLICKED.toString()){
+            val id = intent!!.extras["messageId"].toString().toLong()
+            Log.d("ChatNote", id.toString())
+            val bundle = bundleOf("messageId" to id)
+
+            navigationController.navigate(R.id.action_mainChatFragment_to_messageFragment,bundle)
+        }
 
         to_notifies_button.setOnClickListener {
             navigationController.navigate(R.id.notificationsFragment)
@@ -125,10 +135,7 @@ class MainActivity : AppCompatActivity() {
         try{
             if (requestCode == NOTIFICATION_CLICKED){
 
-                val _id = data!!.extras["messageId"].toString().toLong()
-                val bundle = bundleOf("messageId" to _id)
 
-                navigationController.navigate(R.id.action_mainChatFragment_to_messageFragment,bundle)
             }
             else {
                 onFragmentResult(requestCode, resultCode, data)

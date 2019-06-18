@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.yshmgrt.chat.MainActivity
@@ -25,11 +26,12 @@ class NotificationsBrodcast():BroadcastReceiver() {
     }
 
     private fun sendNotif(context: Context, message: Message){
+        Log.d("ChatNote", message._id.toString())
         val notificManage = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val intent = Intent(context, MainActivity::class.java)
         intent.action = MainActivity.NOTIFICATION_CLICKED.toString()
         intent.putExtra("messageId",message._id)
-        val pendingIntent = PendingIntent.getActivity(context, MainActivity.NOTIFICATION_CLICKED, intent,0)
+        val pendingIntent = PendingIntent.getActivity(context, MainActivity.NOTIFICATION_CLICKED, intent,PendingIntent.FLAG_UPDATE_CURRENT)
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -41,8 +43,8 @@ class NotificationsBrodcast():BroadcastReceiver() {
             }
             // Register the channel with the system
             notificManage.createNotificationChannel(channel)
-            var builder = NotificationCompat.Builder(context, MainActivity.CHANNEL_ID)
-                .setSmallIcon(R.drawable.placeholder)
+            val builder = NotificationCompat.Builder(context, MainActivity.CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_event_notification)
                 .setContentTitle("ChatNote notification")
                 .setContentText(message.text)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -50,12 +52,23 @@ class NotificationsBrodcast():BroadcastReceiver() {
                 .setAutoCancel(true)
             with(NotificationManagerCompat.from(context)) {
                 // notificationId is a unique int for each notification that you must define
-                notify(0, builder.build())
+                notify(message._id.toInt(), builder.build())
             }
 
         }
         else{
-
+            val builder = NotificationCompat.Builder(context)
+                .setSmallIcon(R.drawable.placeholder)
+                .setContentTitle("ChatNote notification")
+                .setContentText(message.text)
+                .setSmallIcon(R.drawable.ic_event_notification)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+            with(NotificationManagerCompat.from(context)) {
+                // notificationId is a unique int for each notification that you must define
+                notify(message._id.toInt(), builder.build())
+            }
         }
 
 

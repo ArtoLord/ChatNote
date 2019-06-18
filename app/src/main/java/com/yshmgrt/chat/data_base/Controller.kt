@@ -132,6 +132,7 @@ class Controller(private val ctx: Context):IController {
             ctx.database.use {
                 select("Message","_id")
                     .whereArgs("time <= ${Date().time}")
+                    .orderBy("time")
                     .exec {
                         lambda(
                             parseList(object : MapRowParser<Long> {
