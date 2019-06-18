@@ -27,6 +27,8 @@ import com.yshmgrt.chat.message.TagView
 import com.yshmgrt.chat.message.attachments.IAttachment
 import com.yshmgrt.chat.message.attachments.Image
 import com.yshmgrt.chat.message.attachments.ImageAttachment
+import com.yshmgrt.chat.message.attachments.notification.Notification
+import com.yshmgrt.chat.message.attachments.notification.NotificationAttachment
 import com.yshmgrt.chat.message.logic.Logic
 import kotlinx.android.synthetic.main.bottom_drawer_fragment.*
 import kotlinx.android.synthetic.main.bottom_drawer_fragment.view.*
@@ -144,6 +146,12 @@ class MainChatFragment : Fragment() {
             (activity as MainActivity).openDrawer{
                 it.add_image.setOnClickListener{
                     ImageAttachment.sendIntentToPick(activity!!)
+                }
+                it.add_event.setOnClickListener{
+                    Log.d("DEBUG1", "OOOO")
+                    val attach = NotificationAttachment.create(Notification(12343L))
+                    attachmentList.add(attach)
+                    view.attachments_view.addView(IAttachment.create(attach)!!.getPreview(context!!))
                 }
             }
         }

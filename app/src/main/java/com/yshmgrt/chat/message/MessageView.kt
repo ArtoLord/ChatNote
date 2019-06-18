@@ -1,7 +1,6 @@
 package com.yshmgrt.chat.message
 
 import android.content.Context
-import android.opengl.Visibility
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
@@ -56,7 +55,7 @@ class MessageView constructor(
             val c = GregorianCalendar()
             c.time = it.time
             val dateFormat = SimpleDateFormat("HH:mm")
-            teg_field_text.text = dateFormat.format(c.time)
+            message_time.text = dateFormat.format(c.time)
             tag = it._id
             Log.d("WORK",it.toString())
             if (it.tags.isEmpty())

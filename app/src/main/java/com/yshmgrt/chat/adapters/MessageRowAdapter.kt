@@ -8,7 +8,6 @@ import com.yshmgrt.chat.R
 import com.yshmgrt.chat.data_base.Controller
 import kotlinx.android.synthetic.main.message_search_row.view.*
 import kotlinx.android.synthetic.main.message_search_row.view.message_text
-import kotlinx.android.synthetic.main.message_view.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 
