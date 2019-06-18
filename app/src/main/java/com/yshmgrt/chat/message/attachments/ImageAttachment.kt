@@ -25,6 +25,8 @@ class AppGlideModule : AppGlideModule()
 
 
 class ImageAttachment( attachment: Attachment) :IAttachment{
+    override fun onSended(context: Context) {
+    }
 
     private val image:Image = Klaxon().parse<Image>(attachment.link)!!
 

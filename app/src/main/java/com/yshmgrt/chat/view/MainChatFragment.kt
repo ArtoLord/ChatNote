@@ -129,7 +129,7 @@ class MainChatFragment : Fragment() {
             if (view.message_edit_text.text.isNotEmpty() || attachmentList.isNotEmpty()){
                 val log = Logic(view.message_edit_text.text.toString()).getTags()
                 val tags = List(log.size){Tag(123,log[it])}
-                controller.sendMessage(SQL_Message(123,view.message_edit_text.text.toString(),Date().time,SQL_Message.USER_TYPE),tags,attachmentList){
+                controller.sendMessage(SQL_Message(123,view.message_edit_text.text.toString(),Date().time,SQL_Message.USER_TYPE),tags,attachmentList,context!!){
                     updateMessageList(controller){
                         adapter!!.notifyDataSetChanged()
                         view.message_edit_text.text.clear()

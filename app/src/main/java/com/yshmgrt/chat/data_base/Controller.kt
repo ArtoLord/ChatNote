@@ -5,6 +5,7 @@ import android.util.Log
 import com.yshmgrt.chat.data_base.Helper.Helper
 import com.yshmgrt.chat.data_base.dataclasses.*
 import com.yshmgrt.chat.database
+import com.yshmgrt.chat.message.attachments.IAttachment
 import org.jetbrains.anko.db.*
 import org.jetbrains.anko.doAsync
 import java.util.*
@@ -287,8 +288,8 @@ class Controller(private val ctx: Context):IController {
                 .exec()
         }
     }
-    fun sendMessage(message:SQL_Message, tags:List<Tag>, attachments:List<Attachment>,onSended:(Boolean)->Unit) {
-        addMessage(message) {
+    fun sendMessage(message:SQL_Message, tags:List<Tag>, attachments:List<Attachment>,context: Context,onSended:(Boolean)->Unit) {
+        addMessage(message) { it ->
             Log.d("WORK", "end")
             val message_id = it
             for (i in tags) {
@@ -299,7 +300,9 @@ class Controller(private val ctx: Context):IController {
             }
             for (a in attachments) {
 
-                addAttachment(Attachment(123, a.type, a.link, message_id)) {}
+                addAttachment(Attachment(123, a.type, a.link, message_id)) {_id->
+                    IAttachment.create(Attachment(_id, a.type, a.link, message_id))!!.onSended(context)
+                }
             }
             onSended(true)
         }

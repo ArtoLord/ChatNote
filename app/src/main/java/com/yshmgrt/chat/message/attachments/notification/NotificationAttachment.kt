@@ -6,6 +6,9 @@ import com.yshmgrt.chat.data_base.dataclasses.Attachment
 import com.yshmgrt.chat.message.attachments.IAttachment
 
 class NotificationAttachment(val attachment: Attachment) : IAttachment {
+    override fun onSended(context: Context) {
+
+    }
 
     private val notification = Klaxon().parse<Notification>(attachment.link)!!
 
