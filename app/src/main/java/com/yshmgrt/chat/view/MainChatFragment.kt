@@ -408,14 +408,36 @@ class MainChatFragment : Fragment() {
     }
 
     var searchVisible = false
+    var date = Calendar.getInstance()
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.search_button){
             changeSearchState()
             return true
         }
+        if (item.itemId == R.id.search_by_date_button){
+            DatePickerDialog(
+                context, d,
+                date.get(Calendar.YEAR),
+                date.get(Calendar.MONTH),
+                date.get(Calendar.DAY_OF_MONTH))
+                .show()
+        }
         return super.onOptionsItemSelected(item)
     }
+
+    private fun setInitialDateTime(date:Calendar) {
+        Log.d("WORK", date.toString())
+    }
+
+    val d: DatePickerDialog.OnDateSetListener =
+        DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+            val date = Calendar.getInstance()
+            date.set(Calendar.YEAR, year)
+            date.set(Calendar.MONTH, monthOfYear)
+            date.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+            setInitialDateTime(date)
+        }
 
     private fun changeSearchState() {
         val status = when(searchVisible){
