@@ -110,6 +110,7 @@ class MainActivity : AppCompatActivity() {
         val PIC_IMAGE_REQUEST = 0
         val PERMISSION_REQUEST = 1
         val NOTIFICATION_CLICKED = 2
+        val PICK_DATABASE = 3
         val CHANNEL_ID = "ChatNote"
         fun getRealPathFromUri(context: Context, contentUri: Uri): String {
             var cursor: Cursor? = null
@@ -130,6 +131,11 @@ class MainActivity : AppCompatActivity() {
     lateinit var onFragmentResult:(Int,Int,Intent?)->Unit
     lateinit var onMessageDelete:()->Unit
     lateinit var onMessageUpdate:(Long)->Unit
+    lateinit var onFragmentBackPressed:()->Unit
+
+    override fun onBackPressed() {
+        onFragmentBackPressed()
+    }
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -147,4 +153,6 @@ class MainActivity : AppCompatActivity() {
             e.printStackTrace()
         }
     }
+
+
 }

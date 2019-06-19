@@ -15,4 +15,6 @@
     <string name="add_message">Open message</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="get_messages_dump">Get messages dump</string>
+    <string name="pick_messages_from_storage">Pick messages from storage</string>
 </resources>
