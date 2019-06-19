@@ -123,4 +123,12 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:visibility="gone"
             android:id="@+id/search_view"/>
+
+    <include
+            android:id="@+id/current_message"
+            layout="@layout/current_message_view"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="gone"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
