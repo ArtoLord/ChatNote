@@ -1,9 +1,9 @@
 package com.yshmgrt.chat.message.attachments
 
 import android.content.Context
-import android.content.Intent
 import android.view.View
 import com.yshmgrt.chat.data_base.dataclasses.Attachment
+import com.yshmgrt.chat.message.attachments.images.ImageAttachment
 import com.yshmgrt.chat.message.attachments.notification.NotificationAttachment
 
 interface IAttachment {

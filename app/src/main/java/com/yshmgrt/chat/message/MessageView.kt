@@ -5,14 +5,15 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.yshmgrt.chat.R
 import com.yshmgrt.chat.data_base.Controller
+import com.yshmgrt.chat.data_base.dataclasses.SQL_Message
 import com.yshmgrt.chat.data_base.dataclasses.Tag
-import com.yshmgrt.chat.latex_extention.LatexPlugin
 import com.yshmgrt.chat.message.attachments.IAttachment
 import com.yshmgrt.chat.view.MessageDialog
 import kotlinx.android.synthetic.main.message_view.view.*
@@ -21,8 +22,8 @@ import ru.noties.markwon.Markwon
 import ru.noties.markwon.core.CorePlugin
 import ru.noties.markwon.ext.latex.JLatexMathPlugin
 import ru.noties.markwon.image.ImagesPlugin
-import java.util.*
 import java.text.SimpleDateFormat
+import java.util.*
 
 
 class MessageView constructor(
@@ -31,10 +32,20 @@ class MessageView constructor(
     defStyle: Int = 0
 ) : LinearLayout(context, attrs, defStyle){
     init {
+
+        val dialogActions = listOf({
+            //open message to add child
+            Toast.makeText(context, "Open message", Toast.LENGTH_SHORT).show()
+        }, {
+            //edit message
+            Toast.makeText(context, "Edit message", Toast.LENGTH_SHORT).show()
+        })
+
+
         LayoutInflater.from(context)
             .inflate(R.layout.message_view, this, true)
         this.setOnLongClickListener {
-            MessageDialog().show((context as AppCompatActivity).supportFragmentManager, "MessageDialogFragment")
+            MessageDialog(dialogActions).show((context as AppCompatActivity).supportFragmentManager, "MessageDialogFragment")
             true
         }
         this.message_text.setOnClickListener { this.callOnClick() }
@@ -47,6 +58,12 @@ class MessageView constructor(
 
         controller.getMessageById(message){
             Log.d("DEBUG",it.toString())
+            if (it.type == SQL_Message.SYSTEM_TYPE){
+                (notification_card.layoutParams as ConstraintLayout.LayoutParams).horizontalBias = 0f
+            }
+            else{
+                (notification_card.layoutParams as ConstraintLayout.LayoutParams).horizontalBias = 1f
+            }
 
             message_text.visibility = if (it.text == "")
                 View.GONE

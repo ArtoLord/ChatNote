@@ -8,10 +8,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.*
-import android.widget.DatePicker
 import android.widget.EditText
-import android.widget.TimePicker
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,23 +17,19 @@ import com.beust.klaxon.Klaxon
 import com.yshmgrt.chat.MainActivity
 import com.yshmgrt.chat.R
 import com.yshmgrt.chat.adapters.MessageRowAdapter
-import com.yshmgrt.chat.adapters.MessageRowViewHolder
 import com.yshmgrt.chat.adapters.MessageViewAdapter
-import com.yshmgrt.chat.adapters.TagViewAdapter
 import com.yshmgrt.chat.data_base.Controller
 import com.yshmgrt.chat.data_base.dataclasses.Attachment
 import com.yshmgrt.chat.data_base.dataclasses.SQL_Message
 import com.yshmgrt.chat.data_base.dataclasses.Tag
 import com.yshmgrt.chat.message.TagView
 import com.yshmgrt.chat.message.attachments.IAttachment
-import com.yshmgrt.chat.message.attachments.Image
-import com.yshmgrt.chat.message.attachments.ImageAttachment
+import com.yshmgrt.chat.message.attachments.images.Image
+import com.yshmgrt.chat.message.attachments.images.ImageAttachment
 import com.yshmgrt.chat.message.attachments.notification.Notification
 import com.yshmgrt.chat.message.attachments.notification.NotificationAttachment
 import com.yshmgrt.chat.message.logic.Logic
-import kotlinx.android.synthetic.main.bottom_drawer_fragment.*
 import kotlinx.android.synthetic.main.bottom_drawer_fragment.view.*
-import kotlinx.android.synthetic.main.main_chat_fragment.*
 import kotlinx.android.synthetic.main.main_chat_fragment.view.*
 import kotlinx.android.synthetic.main.search_fragment.*
 import kotlinx.android.synthetic.main.search_fragment.view.*
@@ -192,7 +185,14 @@ class MainChatFragment : Fragment() {
             if (requestCode==MainActivity.PIC_IMAGE_REQUEST){
                 val uri = data!!.data
                 val attach = Attachment(123,Attachment.IMAGE_TYPE.toString(),
-                    Klaxon().toJsonString(Image(MainActivity.getRealPathFromUri(context!!,uri as Uri))),123)
+                    Klaxon().toJsonString(
+                        Image(
+                            MainActivity.getRealPathFromUri(
+                                context!!,
+                                uri as Uri
+                            )
+                        )
+                    ),123)
                 attachmentList.add(attach)
                 view.attachments_view.addView(IAttachment.create(attach)!!.getPreview(context!!))
             }
