@@ -1,5 +1,6 @@
 package com.yshmgrt.chat.view
 
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.net.Uri
@@ -8,6 +9,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -64,12 +66,11 @@ class MainChatFragment : Fragment() {
         val toolbar = (activity as AppCompatActivity).supportActionBar!!
         if (state <= 1) {
             toolbar.setDisplayHomeAsUpEnabled(false)
-            toolbar.setDisplayShowHomeEnabled(false)
-            toolbar.setLogo(R.mipmap.ic_launcher_square)
+            toolbar.setDisplayUseLogoEnabled(true)
         }
         else {
             toolbar.setDisplayHomeAsUpEnabled(true)
-            toolbar.setDisplayShowHomeEnabled(true)
+            toolbar.setDisplayUseLogoEnabled(false)
         }
     }
 
@@ -531,6 +532,9 @@ class MainChatFragment : Fragment() {
                 View.GONE
             }
             false -> {
+                search_edit_text.requestFocus()
+                (context!!.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager)
+                    .toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
                 state = state or State.SEARCH
                 View.VISIBLE
             }
