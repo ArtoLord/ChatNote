@@ -24,12 +24,14 @@ import com.yshmgrt.chat.data_base.dataclasses.Link
 import com.yshmgrt.chat.data_base.dataclasses.SQL_Message
 import com.yshmgrt.chat.data_base.dataclasses.Tag
 import com.yshmgrt.chat.message.TagView
+import com.yshmgrt.chat.message.attachments.AttachmentView
 import com.yshmgrt.chat.message.attachments.IAttachment
 import com.yshmgrt.chat.message.attachments.images.Image
 import com.yshmgrt.chat.message.attachments.images.ImageAttachment
 import com.yshmgrt.chat.message.attachments.notification.Notification
 import com.yshmgrt.chat.message.attachments.notification.NotificationAttachment
 import com.yshmgrt.chat.message.logic.Logic
+import kotlinx.android.synthetic.main.attachment_background_card.view.*
 import kotlinx.android.synthetic.main.bottom_drawer_fragment.view.*
 import kotlinx.android.synthetic.main.current_message_view.view.*
 import kotlinx.android.synthetic.main.main_chat_fragment.view.*
@@ -279,7 +281,12 @@ class MainChatFragment : Fragment() {
                                     today[Calendar.MINUTE] = mm
                                     val attach = NotificationAttachment.create(Notification(today.timeInMillis))
                                     attachmentList.add(attach)
-                                    view.attachments_view.addView(IAttachment.create(attach)!!.getPreview(context!!))
+                                    val v = AttachmentView(context!!, attach)
+                                    v.delete_attachment.setOnClickListener {
+                                        v.visibility = View.GONE
+                                        attachmentList.remove(attach)
+                                    }
+                                    view.attachments_view.addView(v)
                                 },
                                 today[Calendar.HOUR_OF_DAY],
                                 today[Calendar.MINUTE],
@@ -316,7 +323,12 @@ class MainChatFragment : Fragment() {
                         )
                     ),123)
                 attachmentList.add(attach)
-                view.attachments_view.addView(IAttachment.create(attach)!!.getPreview(context!!))
+                val v = AttachmentView(context!!, attach)
+                v.delete_attachment.setOnClickListener {
+                    v.visibility = View.GONE
+                    attachmentList.remove(attach)
+                }
+                view.attachments_view.addView(v)
             }
         }
 
