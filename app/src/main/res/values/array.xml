@@ -3,5 +3,6 @@
     <array name="message_dialog">
         <item>@string/add_message</item>
         <item>@string/edit</item>
+        <item>@string/delete</item>
     </array>
 </resources>

@@ -8,6 +8,7 @@ import com.yshmgrt.chat.database
 import com.yshmgrt.chat.message.attachments.IAttachment
 import org.jetbrains.anko.db.*
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 import java.util.*
 
 class Controller(private val ctx: Context):IController {
@@ -61,6 +62,19 @@ class Controller(private val ctx: Context):IController {
             override fun onBegin() {}
             override fun onEnd(exit: Message) {onEnd(exit)}
         })
+    }
+
+    fun deleteMessageById(_id : Long, onEnd : () -> Unit) {
+        doAsync {
+            ctx.database.use {
+                delete("Link", "messageId = {id}", "id" to _id)
+                delete("Attachment", "parentId = {id}", "id" to _id)
+                delete("Message", "_id = {id}", "id" to _id)
+            }
+            ctx.runOnUiThread {
+                onEnd()
+            }
+        }
     }
 
     fun getMessagesByTags(tags:List<Long>, onEnd: (Collection<Long>) -> Unit){
