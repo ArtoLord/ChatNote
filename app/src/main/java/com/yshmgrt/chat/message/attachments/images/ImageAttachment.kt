@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import com.beust.klaxon.Klaxon
 import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.module.AppGlideModule
+import com.yshmgrt.chat.ImageActivity
 import com.yshmgrt.chat.MainActivity
 import com.yshmgrt.chat.R
 import com.yshmgrt.chat.message.attachments.IAttachment
@@ -34,8 +35,15 @@ class ImageAttachment( attachment: Attachment) : IAttachment {
         val view = ImageView(context)
         GlideApp.with(context)
             .load(File(image.path))
+            .override(600,600)
+            .centerCrop()
             .placeholder(context.getDrawable(R.drawable.placeholder))
             .into(view.source)
+        view.setOnClickListener {
+            val intent = Intent(context,ImageActivity::class.java)
+            intent.putExtra("ImageLink",image.path)
+            context.startActivity(intent)
+        }
         return view
     }
     override fun getPreview(context:Context): View {

@@ -25,6 +25,7 @@
                 <action android:name="ChatNoteBrodcast"/>
             </intent-filter>
         </receiver>
+        <activity android:name=".ImageActivity"/>
     </application>
 
 </manifest>

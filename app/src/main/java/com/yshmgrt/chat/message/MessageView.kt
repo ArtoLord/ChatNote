@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.navigation.Navigation
@@ -107,9 +108,17 @@ class MessageView constructor(
         }, {
             (context as MainActivity).onMessageUpdate(id)
         }, {
-            Controller(context).deleteMessageById(id) {
-                (context as MainActivity).onMessageDelete()
-            }
+            AlertDialog.Builder(context)
+                .setTitle("delete message")
+                .setMessage("Are you sure you want to delete this message?")
+                .setPositiveButton("Yes"){_,_->
+                    Controller(context).deleteMessageById(id) {
+                        (context as MainActivity).onMessageDelete()
+                    }
+                }
+                .setNegativeButton("No"){_,_->}
+                .show()
+
         })
 
         this.setOnLongClickListener {
