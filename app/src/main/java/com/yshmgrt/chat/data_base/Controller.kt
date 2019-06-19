@@ -137,7 +137,7 @@ class Controller(private val ctx: Context):IController {
                     "type" to message.type
                 )
                 onEnd(exit)
-                insert(
+                if (message.type==SQL_Message.USER_TYPE) insert(
                     Helper.VIRTUAL_MESSAGE_TABLE,
                     "text" to message.text,
                     "_id" to exit
