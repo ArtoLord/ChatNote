@@ -101,6 +101,7 @@ class MainChatFragment : Fragment() {
             parentID = it
         }
 
+
         tagsRecycle = view.tags_search_recycler
         tagsCard = view.search_view
         editSearch = view.search_edit_text
@@ -157,6 +158,11 @@ class MainChatFragment : Fragment() {
                         }
                     }
                 }
+            }
+        }
+        (activity as MainActivity).onMessageUpdate = {
+            updateMessageList(controller){
+                adapter!!.notifyDataSetChanged()
             }
         }
 

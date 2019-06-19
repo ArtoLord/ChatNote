@@ -5,24 +5,27 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.yshmgrt.chat.MainActivity
 import com.yshmgrt.chat.R
 import com.yshmgrt.chat.data_base.Controller
 import com.yshmgrt.chat.data_base.dataclasses.SQL_Message
 import com.yshmgrt.chat.data_base.dataclasses.Tag
-import com.yshmgrt.chat.latex_extention.LatexPlugin
 import com.yshmgrt.chat.message.attachments.IAttachment
+import com.yshmgrt.chat.view.MessageDialog
 import kotlinx.android.synthetic.main.message_view.view.*
 import kotlinx.android.synthetic.main.tag_view.view.*
+import kotlinx.android.synthetic.main.main_chat_fragment.*
 import ru.noties.markwon.Markwon
 import ru.noties.markwon.core.CorePlugin
 import ru.noties.markwon.ext.latex.JLatexMathPlugin
 import ru.noties.markwon.image.ImagesPlugin
-import java.util.*
 import java.text.SimpleDateFormat
+import java.util.*
 
 
 class MessageView constructor(
@@ -33,11 +36,15 @@ class MessageView constructor(
     init {
         LayoutInflater.from(context)
             .inflate(R.layout.message_view, this, true)
+        this.message_text.setOnClickListener { this.callOnClick() }
+        this.message_text.setOnLongClickListener { this.performLongClick() }
     }
 
 
     private val tagList = mutableListOf<Tag>()
     fun setThisMessage(message:Long, controller: Controller, tagOnClick:(View)->Unit){
+
+        initDialog(message)
 
         controller.getMessageById(message){
             Log.d("DEBUG",it.toString())
@@ -89,6 +96,25 @@ class MessageView constructor(
                     attachments.addView(attach!!.getMessageView(context))
                 }
             }
+        }
+    }
+
+    private fun initDialog(id : Long) {
+        val dialogActions = listOf({
+            //open message to add child
+            Toast.makeText(context, "Open message", Toast.LENGTH_SHORT).show()
+        }, {
+            //edit message
+            Toast.makeText(context, "Edit message", Toast.LENGTH_SHORT).show()
+        }, {
+            Controller(context).deleteMessageById(id) {
+                (context as MainActivity).onMessageUpdate()
+            }
+        })
+
+        this.setOnLongClickListener {
+            MessageDialog(dialogActions).show((context as AppCompatActivity).supportFragmentManager, "MessageDialogFragment")
+            true
         }
     }
     class MessageViewHolder(val messageView: MessageView): RecyclerView.ViewHolder(messageView)

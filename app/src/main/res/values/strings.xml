@@ -10,4 +10,7 @@
     <string name="image">Image</string>
     <string name="search_tags">Tags</string>
     <string name="search_messages">Messages</string>
+    <string name="add_message">Add message</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
 </resources>
