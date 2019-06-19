@@ -1,4 +1,4 @@
-package com.yshmgrt.chat.message.attachments
+package com.yshmgrt.chat.message.attachments.images
 
 import android.Manifest
 import android.app.Activity
@@ -10,39 +10,38 @@ import java.io.File
 import android.content.Intent
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
-import android.graphics.drawable.ColorDrawable
 import androidx.core.content.ContextCompat
 import com.beust.klaxon.Klaxon
-import com.bumptech.glide.Glide
 import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.module.AppGlideModule
 import com.yshmgrt.chat.MainActivity
 import com.yshmgrt.chat.R
+import com.yshmgrt.chat.message.attachments.IAttachment
 
 
 @GlideModule
 class AppGlideModule : AppGlideModule()
 
 
-class ImageAttachment(val context: Context, attachment: Attachment) :IAttachment{
+class ImageAttachment( attachment: Attachment) : IAttachment {
+    override fun onSended(context: Context) {
+    }
 
-    private val image:Image = Klaxon().parse<Image>(attachment.link)!!
+    private val image: Image = Klaxon().parse<Image>(attachment.link)!!
 
 
-    override fun getMessageView(): View {
+    override fun getMessageView(context:Context): View {
         val view = ImageView(context)
-        GlideApp
-            .with(context)
+        GlideApp.with(context)
             .load(File(image.path))
             .placeholder(context.getDrawable(R.drawable.placeholder))
             .into(view.source)
         return view
     }
-    override fun getPreview(): View {
-        val a = com.yshmgrt.chat.message.attachments.AppGlideModule()
+    override fun getPreview(context:Context): View {
+        val a = com.yshmgrt.chat.message.attachments.images.AppGlideModule()
         val view = ImageView(context)
-        GlideApp
-            .with(context)
+        GlideApp.with(context)
             .load(File(image.path))
             .override(300,300)
             .centerCrop()

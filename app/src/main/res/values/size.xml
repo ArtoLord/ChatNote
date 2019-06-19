@@ -2,4 +2,5 @@
 <resources>
     <dimen name="main_text_size">18sp</dimen>
     <dimen name="im_sc_x">0.6666</dimen>
+    <dimen name="message_card_corner_radius">16dp</dimen>
 </resources>
