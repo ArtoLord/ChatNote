@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.yshmgrt.chat.MainActivity
 import com.yshmgrt.chat.R
@@ -19,6 +20,7 @@ import com.yshmgrt.chat.message.attachments.IAttachment
 import com.yshmgrt.chat.view.MessageDialog
 import kotlinx.android.synthetic.main.message_view.view.*
 import kotlinx.android.synthetic.main.tag_view.view.*
+import org.jetbrains.anko.bundleOf
 import ru.noties.markwon.Markwon
 import ru.noties.markwon.core.CorePlugin
 import ru.noties.markwon.ext.latex.JLatexMathPlugin
@@ -100,8 +102,8 @@ class MessageView constructor(
 
     private fun initDialog(id : Long) {
         val dialogActions = listOf({
-            //open message to add child
-            Toast.makeText(context, "Open message", Toast.LENGTH_SHORT).show()
+            val bundle = bundleOf("messageId" to id)
+            Navigation.findNavController(this).navigate(R.id.action_mainChatFragment_to_messageFragment,bundle)
         }, {
             (context as MainActivity).onMessageUpdate(id)
         }, {

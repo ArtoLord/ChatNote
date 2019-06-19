@@ -75,7 +75,18 @@ class Controller(private val ctx: Context):IController {
 
     fun updateMessage(message: SQL_Message, tags:List<Tag>, attachments: List<Attachment>, context: Context, onEnd: (Long) -> Unit){
         ctx.database.use {
-            delete("Link", "messageId = {id}", "id" to message._id)
+            select("Link")
+                .whereArgs("messageId = {id}", "id" to message._id)
+                .exec {
+                    for (i in parseList(classParser<Link>())){
+                        getTagById(i.tagId){
+                            if (it.type == Tag.USER_TYPE){
+                                delete("Link", "messageId = {id} AND tagId = ${i.tagId}", "id" to message._id)
+                            }
+                        }
+                    }
+                }
+
             delete("Attachment", "parentId = {id}", "id" to message._id)
             updateMessage(message)
             for (i in tags) {
