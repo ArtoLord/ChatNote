@@ -5,8 +5,10 @@ import android.util.Log
 import com.yshmgrt.chat.data_base.Helper.Helper
 import com.yshmgrt.chat.data_base.dataclasses.*
 import com.yshmgrt.chat.database
+import com.yshmgrt.chat.message.attachments.IAttachment
 import org.jetbrains.anko.db.*
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 import java.util.*
 
 class Controller(private val ctx: Context):IController {
@@ -16,7 +18,7 @@ class Controller(private val ctx: Context):IController {
                 ctx.database.use {
                     select("Message")
                         .whereArgs(
-                            "_id = {id}",
+                            "_id = {id} AND time <= ${Date().time}",
                             "id" to _id
                         )
                         .exec {
@@ -39,7 +41,7 @@ class Controller(private val ctx: Context):IController {
                                                             return columns.getValue("_id").toString().toLong()
                                                         }
                                                     })
-                                                    callback.onEnd(Message(sqlMessage._id,sqlMessage.text,attachmentList,tagList,
+                                                    callback.onEnd(Message(sqlMessage._id,sqlMessage.text, sqlMessage.type, attachmentList,tagList,
                                                         Date(sqlMessage.time)))
 
                                                 }
@@ -62,12 +64,77 @@ class Controller(private val ctx: Context):IController {
         })
     }
 
+    fun deleteMessageById(_id : Long, onEnd : () -> Unit) {
+            ctx.database.use {
+                delete("Link", "messageId = {id}", "id" to _id)
+                delete("Attachment", "parentId = {id}", "id" to _id)
+                delete("Message", "_id = {id}", "id" to _id)
+                onEnd()
+            }
+    }
+
+    fun updateMessage(message: SQL_Message, tags:List<Tag>, attachments: List<Attachment>, context: Context, onEnd: (Long) -> Unit){
+        ctx.database.use {
+            select("Link")
+                .whereArgs("messageId = {id}", "id" to message._id)
+                .exec {
+                    for (i in parseList(classParser<Link>())){
+                        getTagById(i.tagId){
+                            if (it.type == Tag.USER_TYPE){
+                                delete("Link", "messageId = {id} AND tagId = ${i.tagId}", "id" to message._id)
+                            }
+                        }
+                    }
+                }
+
+            delete("Attachment", "parentId = {id}", "id" to message._id)
+            updateMessage(message)
+            for (i in tags) {
+                addTag(i) { exit ->
+                    Log.d("WORK", "end")
+                    addLink(Link(123, message._id, exit))
+                }
+            }
+            for (a in attachments) {
+                addAttachment(Attachment(123, a.type, a.link, message._id)) {_id->
+                    IAttachment.create(Attachment(_id, a.type, a.link, message._id))!!.onSended(context)
+                }
+            }
+            onEnd(message._id)
+        }
+    }
+
+    fun getMessagesByTags(tags:List<Long>, onEnd: (Collection<Long>) -> Unit){
+        ctx.database.use {
+            var messageList = mutableSetOf<Long>()
+            getAllMessageId {
+                messageList.addAll(it)
+                for (i in 0 until tags.size) {
+                    select("Link", "messageId")
+                        .whereArgs("tagId = ${tags[i]}")
+                        .exec {
+                            messageList = messageList.intersect(parseList(object :MapRowParser<Long>{
+                                override fun parseRow(columns: Map<String, Any?>): Long {
+                                    return columns.getValue("messageId").toString().toLong()
+                                }
+                            })).toMutableSet()
+                            if(i==tags.size-1){
+                                onEnd(messageList)
+                            }
+                        }
+                }
+            }
+
+        }
+    }
+
     private fun addMessage(message: SQL_Message, onEnd: (Long) -> Unit){
             ctx.database.use {
                 val exit = insert(
                     "Message",
                     "text" to message.text,
-                    "time" to message.time
+                    "time" to message.time,
+                    "type" to message.type
                 )
                 onEnd(exit)
                 insert(
@@ -105,6 +172,8 @@ class Controller(private val ctx: Context):IController {
         try {
             ctx.database.use {
                 select("Message","_id")
+                    .whereArgs("time <= ${Date().time}")
+                    .orderBy("time")
                     .exec {
                         lambda(
                             parseList(object : MapRowParser<Long> {
@@ -195,11 +264,12 @@ class Controller(private val ctx: Context):IController {
 
     }
 
-    private fun addTag(tag:Tag, onEnd:(Long)->Unit){
+    fun addTag(tag:Tag, onEnd:(Long)->Unit){
             ctx.database.use {
                 val out = insert(
                     "Tag",
-                    "text" to tag.text
+                    "text" to tag.text,
+                    "type" to tag.type
                 )
                 if (out ==-1L){
                     select("Tag","_id")
@@ -226,6 +296,24 @@ class Controller(private val ctx: Context):IController {
             }
 
     }
+
+    fun getParentTag(_id:Long,onEnd: (Long) -> Unit) {
+        ctx.database.use {
+                val ret = select("Tag","_id")
+                    .whereArgs("type = ${Tag.PARENT_TYPE} AND text = {id}","id" to "#$_id")
+                    .exec { parseList(object :MapRowParser<Long>{
+                        override fun parseRow(columns: Map<String, Any?>): Long {
+                            return columns["_id"].toString().toLong()
+                        }
+                    })}
+            if (ret.size==0){
+                onEnd(-1L)
+            }
+            else{
+                onEnd(ret[0])
+            }
+        }
+    }
     private fun addAttachment(tag:Attachment, onEnd: (Long) -> Unit){
             ctx.database.use {
                 onEnd(
@@ -239,7 +327,7 @@ class Controller(private val ctx: Context):IController {
 
     }
 
-    private fun addLink(tag: Link){
+    fun addLink(tag: Link){
             ctx.database.use {
                 insert(
                     "Link",
@@ -254,17 +342,14 @@ class Controller(private val ctx: Context):IController {
             update(
                 "Message",
                 "text" to message.text,
-                "time" to message.time
+                "time" to message.time,
+                "type" to message.type
             )
                 .whereArgs("_id = {id}", "id" to message._id)
                 .exec()
         }
     }
-    private fun createSQL_message(message: Message): SQL_Message {
-        return SQL_Message(message._id, message.text, message.time.time)
-    }
-
-    fun sendMessage(message:SQL_Message, tags:List<Tag>, attachments:List<Attachment>,onSended:(Boolean)->Unit) {
+    fun sendMessage(message:SQL_Message, tags:List<Tag>, attachments:List<Attachment>,context: Context,onSended:(Long)->Unit) {
         addMessage(message) { it ->
             Log.d("WORK", "end")
             val message_id = it
@@ -276,9 +361,27 @@ class Controller(private val ctx: Context):IController {
             }
             for (a in attachments) {
 
-                addAttachment(Attachment(123, a.type, a.link, message_id)) {}
+                addAttachment(Attachment(123, a.type, a.link, message_id)) {_id->
+                    IAttachment.create(Attachment(_id, a.type, a.link, message_id))!!.onSended(context)
+                }
             }
-            onSended(true)
+            onSended(it)
+        }
+    }
+
+
+    fun resendMessage(_id: Long, time:Long){
+        getMessageById(_id){message->
+            addMessage(SQL_Message(123,message.text,time,SQL_Message.SYSTEM_TYPE)){message_id->
+                for (i in message.tags){
+                    addLink(Link(123,message_id,i))
+                }
+                for (i in message.attachment){
+                    getAttachmentById(i){attach->
+                        addAttachment(Attachment(123,attach.type,attach.link,message_id)){}
+                    }
+                }
+            }
         }
     }
 

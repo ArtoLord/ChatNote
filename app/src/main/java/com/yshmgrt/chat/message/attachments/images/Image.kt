@@ -1,4 +1,4 @@
-package com.yshmgrt.chat.message.attachments
+package com.yshmgrt.chat.message.attachments.images
 
 import android.annotation.TargetApi
 import android.content.Context

@@ -20,6 +20,11 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <receiver android:name=".message.attachments.notification.NotificationsBrodcast">
+            <intent-filter>
+                <action android:name="ChatNoteBrodcast"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

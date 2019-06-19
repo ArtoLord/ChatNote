@@ -12,4 +12,7 @@
     <string name="search_messages">Messages</string>
     <string name="search_by_date">Search by date</string>
     <string name="document">Document</string>
+    <string name="add_message">Open message</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
 </resources>
