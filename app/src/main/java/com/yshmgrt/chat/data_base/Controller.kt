@@ -65,15 +65,31 @@ class Controller(private val ctx: Context):IController {
     }
 
     fun deleteMessageById(_id : Long, onEnd : () -> Unit) {
-        doAsync {
             ctx.database.use {
                 delete("Link", "messageId = {id}", "id" to _id)
                 delete("Attachment", "parentId = {id}", "id" to _id)
                 delete("Message", "_id = {id}", "id" to _id)
-            }
-            ctx.runOnUiThread {
                 onEnd()
             }
+    }
+
+    fun updateMessage(message: SQL_Message, tags:List<Tag>, attachments: List<Attachment>, context: Context, onEnd: () -> Unit){
+        ctx.database.use {
+            delete("Link", "messageId = {id}", "id" to message._id)
+            delete("Attachment", "parentId = {id}", "id" to message._id)
+            updateMessage(message)
+            for (i in tags) {
+                addTag(i) { exit ->
+                    Log.d("WORK", "end")
+                    addLink(Link(123, message._id, exit))
+                }
+            }
+            for (a in attachments) {
+                addAttachment(Attachment(123, a.type, a.link, message._id)) {_id->
+                    IAttachment.create(Attachment(_id, a.type, a.link, message._id))!!.onSended(context)
+                }
+            }
+            onEnd()
         }
     }
 
