@@ -72,13 +72,15 @@ class MessageView constructor(
                 tags_linear.visibility = View.VISIBLE
             for (i in it.tags)
                 controller.getTagById(i){exit->
-                    val tv = TagView(context)
-                    tv.tag = exit._id
-                    tv.tag_text.text = exit.text
-                    tv.setOnClickListener(
-                        tagOnClick
-                    )
-                    teg_field.addView(tv)
+                    if (exit.type==Tag.USER_TYPE) {
+                        val tv = TagView(context)
+                        tv.tag = exit._id
+                        tv.tag_text.text = exit.text
+                        tv.setOnClickListener(
+                            tagOnClick
+                        )
+                        teg_field.addView(tv)
+                    }
                 }
             attachments.removeAllViews()
             for (i in it.attachment){

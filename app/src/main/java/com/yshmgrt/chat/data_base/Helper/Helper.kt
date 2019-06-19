@@ -44,7 +44,8 @@ class Helper private constructor(ctx: Context):ManagedSQLiteOpenHelper(ctx, "Mai
         )
         db.createTable("Tag", true,
             "_id" to INTEGER+ PRIMARY_KEY+ UNIQUE,
-            "text" to TEXT+ UNIQUE
+            "text" to TEXT+ UNIQUE,
+            "type" to INTEGER
         )
         db.createTable("Link", true,
             "_id" to INTEGER+ PRIMARY_KEY+ UNIQUE,

@@ -223,11 +223,12 @@ class Controller(private val ctx: Context):IController {
 
     }
 
-    private fun addTag(tag:Tag, onEnd:(Long)->Unit){
+    fun addTag(tag:Tag, onEnd:(Long)->Unit){
             ctx.database.use {
                 val out = insert(
                     "Tag",
-                    "text" to tag.text
+                    "text" to tag.text,
+                    "type" to tag.type
                 )
                 if (out ==-1L){
                     select("Tag","_id")
@@ -254,6 +255,24 @@ class Controller(private val ctx: Context):IController {
             }
 
     }
+
+    fun getParentTag(_id:Long,onEnd: (Long) -> Unit) {
+        ctx.database.use {
+                val ret = select("Tag","_id")
+                    .whereArgs("type = ${Tag.PARENT_TYPE} AND text = {id}","id" to "#$_id")
+                    .exec { parseList(object :MapRowParser<Long>{
+                        override fun parseRow(columns: Map<String, Any?>): Long {
+                            return columns["_id"].toString().toLong()
+                        }
+                    })}
+            if (ret.size==0){
+                onEnd(-1L)
+            }
+            else{
+                onEnd(ret[0])
+            }
+        }
+    }
     private fun addAttachment(tag:Attachment, onEnd: (Long) -> Unit){
             ctx.database.use {
                 onEnd(
@@ -267,7 +286,7 @@ class Controller(private val ctx: Context):IController {
 
     }
 
-    private fun addLink(tag: Link){
+    fun addLink(tag: Link){
             ctx.database.use {
                 insert(
                     "Link",
@@ -289,7 +308,7 @@ class Controller(private val ctx: Context):IController {
                 .exec()
         }
     }
-    fun sendMessage(message:SQL_Message, tags:List<Tag>, attachments:List<Attachment>,context: Context,onSended:(Boolean)->Unit) {
+    fun sendMessage(message:SQL_Message, tags:List<Tag>, attachments:List<Attachment>,context: Context,onSended:(Long)->Unit) {
         addMessage(message) { it ->
             Log.d("WORK", "end")
             val message_id = it
@@ -305,7 +324,7 @@ class Controller(private val ctx: Context):IController {
                     IAttachment.create(Attachment(_id, a.type, a.link, message_id))!!.onSended(context)
                 }
             }
-            onSended(true)
+            onSended(it)
         }
     }
 

@@ -20,6 +20,7 @@ import com.yshmgrt.chat.adapters.MessageRowAdapter
 import com.yshmgrt.chat.adapters.MessageViewAdapter
 import com.yshmgrt.chat.data_base.Controller
 import com.yshmgrt.chat.data_base.dataclasses.Attachment
+import com.yshmgrt.chat.data_base.dataclasses.Link
 import com.yshmgrt.chat.data_base.dataclasses.SQL_Message
 import com.yshmgrt.chat.data_base.dataclasses.Tag
 import com.yshmgrt.chat.message.TagView
@@ -40,46 +41,44 @@ import java.util.*
 class MainChatFragment : Fragment() {
 
     var tagList = mutableSetOf<Long>()
+    var parentID = -1L
 
     var adapter: MessageViewAdapter? = null
     private lateinit var linearLayoutManager: LinearLayoutManager
     val messageList = mutableListOf<Long>()
-    fun updateMessageList(controller: Controller,tag:Collection<Long>  = emptyList(), onUpdate:(Collection<Long>)->Unit){
-        if (tag.isEmpty()){
-                controller.getAllMessageId{ exit->
-                    messageList.clear()
-                    messageList.addAll(exit)
-                    onUpdate(exit)
-            }
-        }
-        else{
-            controller.getMessagesByTags(tag.toList()){exit->
-                Log.d("TAGS_DEBUG", exit.size.toString())
+    fun updateMessageList(controller: Controller,tag:Collection<Long>  = tagList, onUpdate:(Collection<Long>)->Unit){
+            val temp = tag.toMutableList()
+            temp.add(parentID)
+            Log.d("TAGS_DEBUG", parentID.toString())
+            controller.getMessagesByTags(temp){exit->
                 messageList.clear()
                 messageList.addAll(exit)
                 onUpdate(exit)
             }
-        }
     }
 
     fun updateTagProvider(view:View, controller: Controller){
         view.tag_provider.removeAllViews()
-        for (i in tagList){
+        val temp = tagList
+        temp.add(parentID)
+        for (i in temp){
             controller.getTagById(i){
-                val tv = TagView(context!!)
-                tv.tag = it._id
-                tv.tag_text.text = it.text
-                tv.close_button.visibility = View.VISIBLE
-                tv.setOnClickListener {_->
-                    val mlist = tagList.toMutableList()
-                    mlist.remove(it._id)
-                    tagList = mlist.toMutableSet()
-                    updateTagProvider(view,controller)
-                    updateMessageList(controller,mlist){
-                        adapter!!.notifyDataSetChanged()
+                //if (it.type==Tag.USER_TYPE) {
+                    val tv = TagView(context!!)
+                    tv.tag = it._id
+                    tv.tag_text.text = it.text
+                    tv.close_button.visibility = View.VISIBLE
+                    tv.setOnClickListener { _ ->
+                        val mlist = tagList.toMutableList()
+                        mlist.remove(it._id)
+                        tagList = mlist.toMutableSet()
+                        updateTagProvider(view, controller)
+                        updateMessageList(controller, mlist) {
+                            adapter!!.notifyDataSetChanged()
+                        }
                     }
-                }
-                view.tag_provider.addView(tv)
+                    view.tag_provider.addView(tv)
+                //}
             }
         }
     }
@@ -95,8 +94,12 @@ class MainChatFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.main_chat_fragment, container, false)
+        //tagList.addAll(systemTagList)
 
         val controller = Controller(context!!)
+        controller.addTag(Tag(123,"#-1",Tag.PARENT_TYPE)){
+            parentID = it
+        }
 
         tagsRecycle = view.tags_search_recycler
         tagsCard = view.search_view
@@ -112,9 +115,21 @@ class MainChatFragment : Fragment() {
             }
         }){
             val _id = it.tag.toString().toLong()
-            val bundle = bundleOf("messageId" to _id)
+            controller.getParentTag(_id){
+                parentID = it
+                controller.getTagById(parentID){
+                    Log.d("ChatNote","clicked ${it._id}")
+                }
+                updateTagProvider(view,controller)
+                updateMessageList(controller, tagList){
+                    adapter!!.notifyDataSetChanged()
+                    view.message_edit_text.text.clear()
+                    view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
+                }
+            }
+            //val bundle = bundleOf("messageId" to _id)
 
-            Navigation.findNavController(view).navigate(R.id.action_mainChatFragment_to_messageFragment,bundle)
+            //Navigation.findNavController(view).navigate(R.id.action_mainChatFragment_to_messageFragment,bundle)
         }
         linearLayoutManager = LinearLayoutManager(context!!.applicationContext)
         linearLayoutManager.stackFromEnd = true
@@ -125,17 +140,23 @@ class MainChatFragment : Fragment() {
         view.send_button.setOnClickListener {
             if (view.message_edit_text.text.isNotEmpty() || attachmentList.isNotEmpty()){
                 val log = Logic(view.message_edit_text.text.toString()).getTags()
-                val tags = List(log.size){Tag(123,log[it])}
-                controller.sendMessage(SQL_Message(123,view.message_edit_text.text.toString(),Date().time,SQL_Message.USER_TYPE),tags,attachmentList,context!!){
-                    updateMessageList(controller){
-                        adapter!!.notifyDataSetChanged()
-                        view.message_edit_text.text.clear()
-                        view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
-                        attachmentList.clear()
-                        view.attachments_view.removeAllViews()
+                val tags = MutableList(log.size){Tag(123,log[it],Tag.USER_TYPE)}
+                controller.getTagById(parentID){pTag->
+                    tags.add(Tag(123, "${pTag.text}",Tag.PARENT_TYPE))
+                    Log.d("DEBUG2",pTag.text)
+                    controller.sendMessage(SQL_Message(123,view.message_edit_text.text.toString(),Date().time,SQL_Message.USER_TYPE),tags,attachmentList,context!!){mId->
+                        controller.addTag(Tag(123, "#$mId",Tag.PARENT_TYPE)){
+                            controller.addLink(Link(123,mId,it))
+                        }
+                        updateMessageList(controller){
+                            adapter!!.notifyDataSetChanged()
+                            view.message_edit_text.text.clear()
+                            view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
+                            attachmentList.clear()
+                            view.attachments_view.removeAllViews()
+                        }
                     }
                 }
-
             }
         }
 
