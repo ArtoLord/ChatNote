@@ -17,4 +17,6 @@
     <string name="delete">Delete</string>
     <string name="to_bookmarks">Add to bookmarks</string>
     <string name="from_bookmarks">Remove from bookmarks</string>
+    <string name="get_messages_dump">Get messages dump</string>
+    <string name="pick_messages_from_storage">Pick messages from storage</string>
 </resources>

@@ -25,7 +25,6 @@ import com.yshmgrt.chat.data_base.dataclasses.SQL_Message
 import com.yshmgrt.chat.data_base.dataclasses.Tag
 import com.yshmgrt.chat.message.TagView
 import com.yshmgrt.chat.message.attachments.AttachmentView
-import com.yshmgrt.chat.message.attachments.IAttachment
 import com.yshmgrt.chat.message.attachments.images.Image
 import com.yshmgrt.chat.message.attachments.images.ImageAttachment
 import com.yshmgrt.chat.message.attachments.notification.Notification
@@ -268,6 +267,15 @@ class MainChatFragment : Fragment() {
                 }
             }
         }
+        (activity as MainActivity).onFragmentBackPressed = {
+            if(parentStack.isNotEmpty()) {
+                parentID = parentStack.pop()
+                updateMessageList(Controller(context!!), tagList) {
+                    adapter!!.notifyDataSetChanged()
+                }
+                updateParentMessage()
+            }
+        }
 
         view.attach_button.setOnClickListener {
             (activity as MainActivity).openDrawer {
@@ -469,7 +477,6 @@ class MainChatFragment : Fragment() {
             onSearchVisible()
         }
     }
-
     fun test() {
         Log.d("DEBUG", "It Works")
     }
