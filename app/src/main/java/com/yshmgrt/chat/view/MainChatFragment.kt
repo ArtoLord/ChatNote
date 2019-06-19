@@ -43,6 +43,9 @@ class MainChatFragment : Fragment() {
     var tagList = mutableSetOf<Long>()
     var parentID = -1L
 
+    var sendStats = true
+    var editableMessageId = -1L
+
     var adapter: MessageViewAdapter? = null
     private lateinit var linearLayoutManager: LinearLayoutManager
     val messageList = mutableListOf<Long>()
@@ -139,30 +142,86 @@ class MainChatFragment : Fragment() {
 
         val attachmentList = mutableListOf<Attachment>()
         view.send_button.setOnClickListener {
-            if (view.message_edit_text.text.isNotEmpty() || attachmentList.isNotEmpty()){
-                val log = Logic(view.message_edit_text.text.toString()).getTags()
-                val tags = MutableList(log.size){Tag(123,log[it],Tag.USER_TYPE)}
-                controller.getTagById(parentID){pTag->
-                    tags.add(Tag(123, "${pTag.text}",Tag.PARENT_TYPE))
-                    Log.d("DEBUG2",pTag.text)
-                    controller.sendMessage(SQL_Message(123,view.message_edit_text.text.toString(),Date().time,SQL_Message.USER_TYPE),tags,attachmentList,context!!){mId->
-                        controller.addTag(Tag(123, "#$mId",Tag.PARENT_TYPE)){
-                            controller.addLink(Link(123,mId,it))
+            if (sendStats) {
+                if (view.message_edit_text.text.isNotEmpty() || attachmentList.isNotEmpty()) {
+                    val log = Logic(view.message_edit_text.text.toString()).getTags()
+                    val tags = MutableList(log.size) { Tag(123, log[it], Tag.USER_TYPE) }
+                    controller.getTagById(parentID) { pTag ->
+                        tags.add(Tag(123, "${pTag.text}", Tag.PARENT_TYPE))
+                        Log.d("DEBUG2", pTag.text)
+                        controller.sendMessage(
+                            SQL_Message(
+                                123,
+                                view.message_edit_text.text.toString(),
+                                Date().time,
+                                SQL_Message.USER_TYPE
+                            ), tags, attachmentList, context!!
+                        ) { mId ->
+                            controller.addTag(Tag(123, "#$mId", Tag.PARENT_TYPE)) {
+                                controller.addLink(Link(123, mId, it))
+                            }
+                            updateMessageList(controller) {
+                                adapter!!.notifyDataSetChanged()
+                                view.message_edit_text.text.clear()
+                                view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
+                                attachmentList.clear()
+                                view.attachments_view.removeAllViews()
+                            }
                         }
-                        updateMessageList(controller){
-                            adapter!!.notifyDataSetChanged()
-                            view.message_edit_text.text.clear()
-                            view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
-                            attachmentList.clear()
-                            view.attachments_view.removeAllViews()
+                    }
+                }
+            }
+            else{
+                if (view.message_edit_text.text.isNotEmpty() || attachmentList.isNotEmpty()) {
+                    sendStats = true
+                    val log = Logic(view.message_edit_text.text.toString()).getTags()
+                    val tags = MutableList(log.size) { Tag(123, log[it], Tag.USER_TYPE) }
+                    controller.getTagById(parentID) { pTag ->
+                        tags.add(Tag(editableMessageId, "${pTag.text}", Tag.PARENT_TYPE))
+                        Log.d("DEBUG2", pTag.text)
+                        controller.getMessageById(editableMessageId) {
+                            controller.updateMessage(
+                                SQL_Message(
+                                    editableMessageId,
+                                    view.message_edit_text.text.toString(),
+                                    it.time.time,
+                                    SQL_Message.USER_TYPE
+                                ), tags, attachmentList, context!!
+                            ) { mId ->
+                                controller.addTag(Tag(123, "#$mId", Tag.PARENT_TYPE)) {
+                                    controller.addLink(Link(123, mId, it))
+                                }
+                                updateMessageList(controller) {
+                                    adapter!!.notifyDataSetChanged()
+                                    view.message_edit_text.text.clear()
+                                    view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
+                                    attachmentList.clear()
+                                    view.attachments_view.removeAllViews()
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-        (activity as MainActivity).onMessageUpdate = {
+        (activity as MainActivity).onMessageDelete = {
             updateMessageList(controller){
                 adapter!!.notifyDataSetChanged()
+            }
+        }
+
+        (activity as MainActivity).onMessageUpdate = {
+            sendStats = false
+            editableMessageId = it
+            controller.getMessageById(it){message->
+                view.message_edit_text.setText(message.text)
+                for (i in message.attachment){
+                    attachmentList.clear()
+                    controller.getAttachmentById(i){attachment->
+                        attachmentList.add(attachment)
+                        view.attachments_view.addView(IAttachment.create(attachment)!!.getPreview(context!!))
+                    }
+                }
             }
         }
 

@@ -128,7 +128,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     lateinit var onFragmentResult:(Int,Int,Intent?)->Unit
-    lateinit var onMessageUpdate:()->Unit
+    lateinit var onMessageDelete:()->Unit
+    lateinit var onMessageUpdate:(Long)->Unit
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

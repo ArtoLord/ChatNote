@@ -73,7 +73,7 @@ class Controller(private val ctx: Context):IController {
             }
     }
 
-    fun updateMessage(message: SQL_Message, tags:List<Tag>, attachments: List<Attachment>, context: Context, onEnd: () -> Unit){
+    fun updateMessage(message: SQL_Message, tags:List<Tag>, attachments: List<Attachment>, context: Context, onEnd: (Long) -> Unit){
         ctx.database.use {
             delete("Link", "messageId = {id}", "id" to message._id)
             delete("Attachment", "parentId = {id}", "id" to message._id)
@@ -89,7 +89,7 @@ class Controller(private val ctx: Context):IController {
                     IAttachment.create(Attachment(_id, a.type, a.link, message._id))!!.onSended(context)
                 }
             }
-            onEnd()
+            onEnd(message._id)
         }
     }
 

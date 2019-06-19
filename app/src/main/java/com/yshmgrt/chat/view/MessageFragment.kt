@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.yshmgrt.chat.R
 import com.yshmgrt.chat.data_base.Controller
+import com.yshmgrt.chat.data_base.dataclasses.Tag
 import com.yshmgrt.chat.message.TagView
 import com.yshmgrt.chat.message.attachments.IAttachment
 import kotlinx.android.synthetic.main.message_fragment.view.*
@@ -38,10 +39,12 @@ class MessageFragment:Fragment() {
             else view.teg_field.visibility = View.VISIBLE
                 for (i in it.tags) {
                     controller.getTagById(i) { exit ->
-                        val tv = TagView(context!!)
-                        tv.tag = exit._id
-                        tv.tag_text.text = exit.text
-                        view.teg_field.addView(tv)
+                        if(exit.type== Tag.USER_TYPE) {
+                            val tv = TagView(context!!)
+                            tv.tag = exit._id
+                            tv.tag_text.text = exit.text
+                            view.teg_field.addView(tv)
+                        }
                     }
                 }
             view.attachments.removeAllViews()

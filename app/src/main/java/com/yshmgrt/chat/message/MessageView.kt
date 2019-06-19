@@ -19,7 +19,6 @@ import com.yshmgrt.chat.message.attachments.IAttachment
 import com.yshmgrt.chat.view.MessageDialog
 import kotlinx.android.synthetic.main.message_view.view.*
 import kotlinx.android.synthetic.main.tag_view.view.*
-import kotlinx.android.synthetic.main.main_chat_fragment.*
 import ru.noties.markwon.Markwon
 import ru.noties.markwon.core.CorePlugin
 import ru.noties.markwon.ext.latex.JLatexMathPlugin
@@ -104,11 +103,10 @@ class MessageView constructor(
             //open message to add child
             Toast.makeText(context, "Open message", Toast.LENGTH_SHORT).show()
         }, {
-            //edit message
-            Toast.makeText(context, "Edit message", Toast.LENGTH_SHORT).show()
+            (context as MainActivity).onMessageUpdate(id)
         }, {
             Controller(context).deleteMessageById(id) {
-                (context as MainActivity).onMessageUpdate()
+                (context as MainActivity).onMessageDelete()
             }
         })
 
