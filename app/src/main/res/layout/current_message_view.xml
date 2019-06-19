@@ -30,7 +30,7 @@
             android:id="@+id/message_time"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            app:layout_constraintEnd_toStartOf="@id/close_button"
+            app:layout_constraintEnd_toStartOf="@id/close_message_button"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             android:textSize="@dimen/main_text_size"

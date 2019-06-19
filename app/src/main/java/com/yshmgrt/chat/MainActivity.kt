@@ -136,6 +136,9 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         onFragmentBackPressed()
     }
+    fun onBackFromOtherPressed(){
+        super.onBackPressed()
+    }
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
