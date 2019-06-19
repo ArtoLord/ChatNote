@@ -45,10 +45,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun openDrawer(onDrawerOpened:(View)->Unit) {
-        val bottomNavDrawer = BottomDrawerFragment(onDrawerOpened)
-        bottomNavDrawer.show(supportFragmentManager, bottomNavDrawer.tag)
+    private var bottomNavDrawer = BottomDrawerFragment().apply { onCreated = {} }
 
+    fun openDrawer(onDrawerOpened:(View)->Unit) {
+        bottomNavDrawer.onCreated = onDrawerOpened
+        bottomNavDrawer.show(supportFragmentManager, bottomNavDrawer.tag)
+    }
+
+    fun closeDrawer() {
+        bottomNavDrawer.dismiss()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

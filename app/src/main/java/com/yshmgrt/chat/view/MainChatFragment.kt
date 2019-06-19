@@ -338,6 +338,7 @@ class MainChatFragment : Fragment() {
             (activity as MainActivity).openDrawer {
                 it.add_image.setOnClickListener {
                     ImageAttachment.sendIntentToPick(activity!!)
+                    (activity as MainActivity).closeDrawer()
                 }
                 it.add_event.setOnClickListener {
                     val today = Calendar.getInstance()
@@ -360,6 +361,7 @@ class MainChatFragment : Fragment() {
                                         attachmentList.remove(attach)
                                     }
                                     view.attachments_view.addView(v)
+                                    (activity as MainActivity).closeDrawer()
                                 },
                                 today[Calendar.HOUR_OF_DAY],
                                 today[Calendar.MINUTE],
