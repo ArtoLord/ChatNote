@@ -31,11 +31,14 @@ import com.yshmgrt.chat.message.attachments.notification.Notification
 import com.yshmgrt.chat.message.attachments.notification.NotificationAttachment
 import com.yshmgrt.chat.message.logic.Logic
 import kotlinx.android.synthetic.main.bottom_drawer_fragment.view.*
+import kotlinx.android.synthetic.main.current_message_view.view.*
 import kotlinx.android.synthetic.main.main_chat_fragment.view.*
 import kotlinx.android.synthetic.main.search_fragment.*
 import kotlinx.android.synthetic.main.search_fragment.view.*
 import kotlinx.android.synthetic.main.tag_view.view.*
+import kotlinx.android.synthetic.main.tag_view.view.close_button
 import org.jetbrains.anko.bundleOf
+import java.text.SimpleDateFormat
 import java.util.*
 
 class MainChatFragment : Fragment() {
@@ -45,6 +48,7 @@ class MainChatFragment : Fragment() {
 
     var sendStats = true
     var editableMessageId = -1L
+    val parentStack = Stack<Long>()
 
     var adapter: MessageViewAdapter? = null
     private lateinit var linearLayoutManager: LinearLayoutManager
@@ -63,10 +67,9 @@ class MainChatFragment : Fragment() {
     fun updateTagProvider(view:View, controller: Controller){
         view.tag_provider.removeAllViews()
         val temp = tagList
-        temp.add(parentID)
         for (i in temp){
             controller.getTagById(i){
-                //if (it.type==Tag.USER_TYPE) {
+                if (it.type==Tag.USER_TYPE) {
                     val tv = TagView(context!!)
                     tv.tag = it._id
                     tv.tag_text.text = it.text
@@ -81,7 +84,33 @@ class MainChatFragment : Fragment() {
                         }
                     }
                     view.tag_provider.addView(tv)
-                //}
+                }
+            }
+        }
+    }
+
+    fun updateParentMessage(){
+        val controller = Controller(context!!)
+        controller.getTagById(parentID) { tag ->
+            if (tag.text != "#-1") {
+                controller.getMessageById(tag.text.slice(1 until tag.text.length).toLong()) {
+                    view!!.current_message.visibility = View.VISIBLE
+                    view!!.message_short.text = it.text.replace("\n", " ").replace(Regex("[ ]+"), " ")
+                    val c = GregorianCalendar()
+                    c.time = it.time
+                    val dateFormat = SimpleDateFormat("HH:mm")
+                    view!!.message_time.text = dateFormat.format(it.time)
+                    view!!.close_message_button.setOnClickListener {
+                        parentID = parentStack.pop()
+                        updateMessageList(Controller(context!!),tagList){
+                            adapter!!.notifyDataSetChanged()
+                        }
+                        updateParentMessage()
+                    }
+                }
+            }
+            else{
+                view!!.current_message.visibility = View.GONE
             }
         }
     }
@@ -120,10 +149,17 @@ class MainChatFragment : Fragment() {
         }){
             val _id = it.tag.toString().toLong()
             controller.getParentTag(_id){
+                if (parentStack.isNotEmpty() && parentStack.peek()!=parentID){
+                    parentStack.push(parentID)
+                }
+                else if (parentStack.isEmpty()){
+                    parentStack.push(parentID)
+                }
                 parentID = it
                 controller.getTagById(parentID){
                     Log.d("ChatNote","clicked ${it._id}")
                 }
+                updateParentMessage()
                 updateTagProvider(view,controller)
                 updateMessageList(controller, tagList){
                     adapter!!.notifyDataSetChanged()

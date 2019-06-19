@@ -7,7 +7,7 @@
 
     <HorizontalScrollView android:layout_width="match_parent"
                           android:layout_height="wrap_content"
-                          app:layout_constraintTop_toTopOf="parent"
+                          app:layout_constraintTop_toBottomOf="@id/current_message"
                           android:id="@+id/horizontal_scroll"
     >
         <LinearLayout android:layout_width="wrap_content"
