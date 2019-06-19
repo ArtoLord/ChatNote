@@ -257,7 +257,12 @@ class MainChatFragment : Fragment() {
                     attachmentList.clear()
                     controller.getAttachmentById(i){attachment->
                         attachmentList.add(attachment)
-                        view.attachments_view.addView(IAttachment.create(attachment)!!.getPreview(context!!))
+                        val v = AttachmentView(context!!, attachment)
+                        v.delete_attachment.setOnClickListener {
+                            v.visibility = View.GONE
+                            attachmentList.remove(attachment)
+                        }
+                        view.attachments_view.addView(v)
                     }
                 }
             }
