@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <array name="message_dialog">
+    <array name="message_dialog_add">
         <item>@string/add_message</item>
         <item>@string/edit</item>
         <item>@string/delete</item>
+        <item>@string/to_bookmarks</item>
+    </array>
+    <array name="message_dialog_remove">
+        <item>@string/add_message</item>
+        <item>@string/edit</item>
+        <item>@string/delete</item>
+        <item>@string/from_bookmarks</item>
     </array>
 </resources>

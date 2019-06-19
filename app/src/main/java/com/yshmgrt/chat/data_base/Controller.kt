@@ -327,16 +327,25 @@ class Controller(private val ctx: Context):IController {
 
     }
 
-    fun addLink(tag: Link){
+    fun addLink(tag: Link, onEnd: () -> Unit = {}){
             ctx.database.use {
                 insert(
                     "Link",
                     "messageId" to tag.messageId,
                     "tagId" to tag.tagId
                 )
+                onEnd()
             }
 
     }
+
+    fun deleteLink(tag : Link, onEnd: () -> Unit = {}) {
+        ctx.database.use {
+            delete("LINK", "(tagId = {tagId}) AND (messageId = {messageId})", "tagId" to tag.tagId, "messageId" to tag.messageId)
+            onEnd()
+        }
+    }
+
     fun updateMessage(message:SQL_Message){
         ctx.database.use {
             update(

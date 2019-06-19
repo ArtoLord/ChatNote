@@ -55,23 +55,27 @@ class MainChatFragment : Fragment() {
     var adapter: MessageViewAdapter? = null
     private lateinit var linearLayoutManager: LinearLayoutManager
     val messageList = mutableListOf<Long>()
-    fun updateMessageList(controller: Controller,tag:Collection<Long>  = tagList, onUpdate:(Collection<Long>)->Unit){
-            val temp = tag.toMutableList()
-            temp.add(parentID)
-            Log.d("TAGS_DEBUG", parentID.toString())
-            controller.getMessagesByTags(temp){exit->
-                messageList.clear()
-                messageList.addAll(exit)
-                onUpdate(exit)
-            }
+    fun updateMessageList(
+        controller: Controller,
+        tag: Collection<Long> = tagList,
+        onUpdate: (Collection<Long>) -> Unit
+    ) {
+        val temp = tag.toMutableList()
+        temp.add(parentID)
+        Log.d("TAGS_DEBUG", parentID.toString())
+        controller.getMessagesByTags(temp) { exit ->
+            messageList.clear()
+            messageList.addAll(exit)
+            onUpdate(exit)
+        }
     }
 
-    fun updateTagProvider(view:View, controller: Controller){
+    fun updateTagProvider(view: View, controller: Controller) {
         view.tag_provider.removeAllViews()
         val temp = tagList
-        for (i in temp){
-            controller.getTagById(i){
-                if (it.type==Tag.USER_TYPE) {
+        for (i in temp) {
+            controller.getTagById(i) {
+                if (it.type == Tag.USER_TYPE) {
                     val tv = TagView(context!!)
                     tv.tag = it._id
                     tv.tag_text.text = it.text
@@ -91,7 +95,7 @@ class MainChatFragment : Fragment() {
         }
     }
 
-    fun updateParentMessage(){
+    fun updateParentMessage() {
         val controller = Controller(context!!)
         controller.getTagById(parentID) { tag ->
             if (tag.text != "#-1") {
@@ -104,14 +108,13 @@ class MainChatFragment : Fragment() {
                     view!!.message_time.text = dateFormat.format(it.time)
                     view!!.close_message_button.setOnClickListener {
                         parentID = parentStack.pop()
-                        updateMessageList(Controller(context!!),tagList){
+                        updateMessageList(Controller(context!!), tagList) {
                             adapter!!.notifyDataSetChanged()
                         }
                         updateParentMessage()
                     }
                 }
-            }
-            else{
+            } else {
                 view!!.current_message.visibility = View.GONE
             }
         }
@@ -122,16 +125,16 @@ class MainChatFragment : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
-    lateinit var tagsCard:View
-    lateinit var tagsRecycle:RecyclerView
-    lateinit var editSearch:EditText
+    lateinit var tagsCard: View
+    lateinit var tagsRecycle: RecyclerView
+    lateinit var editSearch: EditText
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.main_chat_fragment, container, false)
         //tagList.addAll(systemTagList)
 
         val controller = Controller(context!!)
-        controller.addTag(Tag(123,"#-1",Tag.PARENT_TYPE)){
+        controller.addTag(Tag(123, "#-1", Tag.PARENT_TYPE)) {
             parentID = it
         }
 
@@ -139,31 +142,30 @@ class MainChatFragment : Fragment() {
         tagsRecycle = view.tags_search_recycler
         tagsCard = view.search_view
         editSearch = view.search_edit_text
-        adapter = MessageViewAdapter(messageList,{
+        adapter = MessageViewAdapter(messageList, {
             val _id = it.tag.toString().toLong()
             tagList.add(_id)
-            updateTagProvider(view,controller)
-            updateMessageList(controller, tagList){
+            updateTagProvider(view, controller)
+            updateMessageList(controller, tagList) {
                 adapter!!.notifyDataSetChanged()
                 view.message_edit_text.text.clear()
                 view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
             }
-        }){
+        }) {
             val _id = it.tag.toString().toLong()
-            controller.getParentTag(_id){
-                if (parentStack.isNotEmpty() && parentStack.peek()!=parentID){
+            controller.getParentTag(_id) {
+                if (parentStack.isNotEmpty() && parentStack.peek() != parentID) {
                     parentStack.push(parentID)
-                }
-                else if (parentStack.isEmpty()){
+                } else if (parentStack.isEmpty()) {
                     parentStack.push(parentID)
                 }
                 parentID = it
-                controller.getTagById(parentID){
-                    Log.d("ChatNote","clicked ${it._id}")
+                controller.getTagById(parentID) {
+                    Log.d("ChatNote", "clicked ${it._id}")
                 }
                 updateParentMessage()
-                updateTagProvider(view,controller)
-                updateMessageList(controller, tagList){
+                updateTagProvider(view, controller)
+                updateMessageList(controller, tagList) {
                     adapter!!.notifyDataSetChanged()
                     view.message_edit_text.text.clear()
                     view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
@@ -208,8 +210,7 @@ class MainChatFragment : Fragment() {
                         }
                     }
                 }
-            }
-            else{
+            } else {
                 if (view.message_edit_text.text.isNotEmpty() || attachmentList.isNotEmpty()) {
                     sendStats = true
                     val log = Logic(view.message_edit_text.text.toString()).getTags()
@@ -243,7 +244,7 @@ class MainChatFragment : Fragment() {
             }
         }
         (activity as MainActivity).onMessageDelete = {
-            updateMessageList(controller){
+            updateMessageList(controller) {
                 adapter!!.notifyDataSetChanged()
             }
         }
@@ -251,11 +252,11 @@ class MainChatFragment : Fragment() {
         (activity as MainActivity).onMessageUpdate = {
             sendStats = false
             editableMessageId = it
-            controller.getMessageById(it){message->
+            controller.getMessageById(it) { message ->
                 view.message_edit_text.setText(message.text)
-                for (i in message.attachment){
+                for (i in message.attachment) {
                     attachmentList.clear()
-                    controller.getAttachmentById(i){attachment->
+                    controller.getAttachmentById(i) { attachment ->
                         attachmentList.add(attachment)
                         val v = AttachmentView(context!!, attachment)
                         v.delete_attachment.setOnClickListener {
@@ -269,18 +270,20 @@ class MainChatFragment : Fragment() {
         }
 
         view.attach_button.setOnClickListener {
-            (activity as MainActivity).openDrawer{
-                it.add_image.setOnClickListener{
+            (activity as MainActivity).openDrawer {
+                it.add_image.setOnClickListener {
                     ImageAttachment.sendIntentToPick(activity!!)
                 }
-                it.add_event.setOnClickListener{
+                it.add_event.setOnClickListener {
                     val today = Calendar.getInstance()
-                    DatePickerDialog(context!!,
+                    DatePickerDialog(
+                        context!!,
                         DatePickerDialog.OnDateSetListener { _, y, m, d ->
                             today[Calendar.YEAR] = y
                             today[Calendar.MONTH] = m
                             today[Calendar.DAY_OF_MONTH] = d
-                            TimePickerDialog(context,
+                            TimePickerDialog(
+                                context,
                                 TimePickerDialog.OnTimeSetListener { _, hh, mm ->
                                     today[Calendar.HOUR_OF_DAY] = hh
                                     today[Calendar.MINUTE] = mm
@@ -295,11 +298,13 @@ class MainChatFragment : Fragment() {
                                 },
                                 today[Calendar.HOUR_OF_DAY],
                                 today[Calendar.MINUTE],
-                                true).show()
+                                true
+                            ).show()
                         },
                         today[Calendar.YEAR],
                         today[Calendar.MONTH],
-                        today[Calendar.DAY_OF_MONTH]).show()
+                        today[Calendar.DAY_OF_MONTH]
+                    ).show()
                 }
             }
         }
@@ -308,17 +313,18 @@ class MainChatFragment : Fragment() {
         view.search_view_back.setOnClickListener {
             changeSearchState()
         }
-        updateMessageList(controller){
+        updateMessageList(controller) {
             adapter!!.notifyDataSetChanged()
             view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
         }
 
 
 
-        (activity as MainActivity).onFragmentResult = {requestCode, resultCode, data->
-            if (requestCode==MainActivity.PIC_IMAGE_REQUEST){
+        (activity as MainActivity).onFragmentResult = { requestCode, resultCode, data ->
+            if (requestCode == MainActivity.PIC_IMAGE_REQUEST) {
                 val uri = data!!.data
-                val attach = Attachment(123,Attachment.IMAGE_TYPE.toString(),
+                val attach = Attachment(
+                    123, Attachment.IMAGE_TYPE.toString(),
                     Klaxon().toJsonString(
                         Image(
                             MainActivity.getRealPathFromUri(
@@ -326,7 +332,8 @@ class MainChatFragment : Fragment() {
                                 uri as Uri
                             )
                         )
-                    ),123)
+                    ), 123
+                )
                 attachmentList.add(attach)
                 val v = AttachmentView(context!!, attach)
                 v.delete_attachment.setOnClickListener {
@@ -341,22 +348,22 @@ class MainChatFragment : Fragment() {
         return view
     }
 
-    fun onSearchVisible(){
+    fun onSearchVisible() {
         val controller = Controller(context!!)
         val messageList = mutableListOf<Long>()
         val tagList = mutableListOf<Long>()
 
-        val tagAdapter = MessageRowAdapter(messageList){
+        val tagAdapter = MessageRowAdapter(messageList) {
             val _id = it.tag.toString().toLong()
             val bundle = bundleOf("messageId" to _id)
-            Navigation.findNavController(it).navigate(R.id.action_mainChatFragment_to_messageFragment,bundle)
+            Navigation.findNavController(it).navigate(R.id.action_mainChatFragment_to_messageFragment, bundle)
             changeSearchState()
         }
 
         val linearTagLayoutManager = LinearLayoutManager(context!!.applicationContext)
         search_message_recycler.layoutManager = linearTagLayoutManager
         search_message_recycler.adapter = tagAdapter
-        controller.getMessageByMessagePatr(search_edit_text.text.toString()){exit->
+        controller.getMessageByMessagePatr(search_edit_text.text.toString()) { exit ->
             val a = mutableSetOf<Long>()
             a.addAll(exit)
 
@@ -364,15 +371,14 @@ class MainChatFragment : Fragment() {
             messageList.addAll(a)
             tagAdapter.notifyDataSetChanged()
         }
-        if (search_edit_text.text.toString().isEmpty()){
+        if (search_edit_text.text.toString().isEmpty()) {
             messages_card.visibility = View.GONE
-        }
-        else{
+        } else {
             messages_card.visibility = View.VISIBLE
         }
         search_edit_text.afterTextChanged {
             messages_card.visibility = View.VISIBLE
-            controller.getMessageByMessagePatr(it){exit->
+            controller.getMessageByMessagePatr(it) { exit ->
                 val a = mutableSetOf<Long>()
                 a.addAll(exit)
 
@@ -388,9 +394,8 @@ class MainChatFragment : Fragment() {
                 tagList.addAll(a)
                 tagAdapter.notifyDataSetChanged()
                 */
-            }
         }
-
+    }
 
 
     fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
@@ -411,22 +416,35 @@ class MainChatFragment : Fragment() {
     var date = Calendar.getInstance()
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.search_button){
+        if (item.itemId == R.id.search_button) {
             changeSearchState()
             return true
         }
-        if (item.itemId == R.id.search_by_date_button){
+        if (item.itemId == R.id.search_by_date_button) {
             DatePickerDialog(
-                context, d,
+                context!!, d,
                 date.get(Calendar.YEAR),
                 date.get(Calendar.MONTH),
-                date.get(Calendar.DAY_OF_MONTH))
+                date.get(Calendar.DAY_OF_MONTH)
+            )
                 .show()
+        }
+        if (item.itemId == R.id.bookmarks) {
+            val controller = Controller(context!!)
+            controller.addTag(Tag(123, "#bookmark", Tag.SYSTEM_TYPE)) {
+                tagList.clear()
+                tagList.add(it)
+                updateTagProvider(view!!, Controller(context!!))
+                updateMessageList(controller, tagList) {
+                    adapter!!.notifyDataSetChanged()
+                }
+
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun setInitialDateTime(date:Calendar) {
+    private fun setInitialDateTime(date: Calendar) {
         Log.d("WORK", date.toString())
     }
 
@@ -440,19 +458,19 @@ class MainChatFragment : Fragment() {
         }
 
     private fun changeSearchState() {
-        val status = when(searchVisible){
-            true-> View.GONE
-            false->View.VISIBLE
+        val status = when (searchVisible) {
+            true -> View.GONE
+            false -> View.VISIBLE
         }
         tagsCard.visibility = status
 
         searchVisible = !searchVisible
-        if(searchVisible){
+        if (searchVisible) {
             onSearchVisible()
         }
     }
 
-    fun test(){
-        Log.d("DEBUG","It Works")
+    fun test() {
+        Log.d("DEBUG", "It Works")
     }
 }

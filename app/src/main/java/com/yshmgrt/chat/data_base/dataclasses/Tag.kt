@@ -4,6 +4,7 @@ data class Tag(val _id:Long, val text:String, val type:Int){
     companion object{
         val USER_TYPE = 0
         val PARENT_TYPE = 1
+        val SYSTEM_TYPE = 2
     }
 }
 
