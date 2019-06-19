@@ -7,12 +7,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.yshmgrt.chat.R
 import com.yshmgrt.chat.data_base.Controller
 import com.yshmgrt.chat.data_base.dataclasses.Tag
 import com.yshmgrt.chat.latex_extention.LatexPlugin
 import com.yshmgrt.chat.message.attachments.IAttachment
+import com.yshmgrt.chat.view.MessageDialog
 import kotlinx.android.synthetic.main.message_view.view.*
 import kotlinx.android.synthetic.main.tag_view.view.*
 import ru.noties.markwon.Markwon
@@ -31,6 +33,12 @@ class MessageView constructor(
     init {
         LayoutInflater.from(context)
             .inflate(R.layout.message_view, this, true)
+        this.setOnLongClickListener {
+            MessageDialog().show((context as AppCompatActivity).supportFragmentManager, "MessageDialogFragment")
+            true
+        }
+        this.message_text.setOnClickListener { this.callOnClick() }
+        this.message_text.setOnLongClickListener { this.performLongClick() }
     }
 
 

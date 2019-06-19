@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="message_dialog">
+        <item>@string/add_message</item>
+        <item>@string/edit</item>
+    </array>
+</resources>
