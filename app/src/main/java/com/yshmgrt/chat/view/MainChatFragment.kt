@@ -9,8 +9,10 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.*
 import android.widget.EditText
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
+import androidx.navigation.NavigatorProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beust.klaxon.Klaxon
@@ -54,6 +56,23 @@ class MainChatFragment : Fragment() {
     var adapter: MessageViewAdapter? = null
     private lateinit var linearLayoutManager: LinearLayoutManager
     val messageList = mutableListOf<Long>()
+
+    var state = State.NONE
+
+
+    private fun updateBackButton() {
+        val toolbar = (activity as AppCompatActivity).supportActionBar!!
+        if (state <= 1) {
+            toolbar.setDisplayHomeAsUpEnabled(false)
+            toolbar.setDisplayShowHomeEnabled(false)
+            toolbar.setLogo(R.mipmap.ic_launcher_square)
+        }
+        else {
+            toolbar.setDisplayHomeAsUpEnabled(true)
+            toolbar.setDisplayShowHomeEnabled(true)
+        }
+    }
+
     fun updateMessageList(
         controller: Controller,
         tag: Collection<Long> = tagList,
@@ -72,6 +91,11 @@ class MainChatFragment : Fragment() {
     fun updateTagProvider(view: View, controller: Controller) {
         view.tag_provider.removeAllViews()
         val temp = tagList
+        state = if (tagList.size > 0)
+            state or State.TAG
+        else
+            state xor State.TAG
+        updateBackButton()
         for (i in temp) {
             controller.getTagById(i) {
                 if (it.type == Tag.USER_TYPE) {
@@ -98,6 +122,8 @@ class MainChatFragment : Fragment() {
         val controller = Controller(context!!)
         controller.getTagById(parentID) { tag ->
             if (tag.text != "#-1") {
+                state = state or State.MESSAGE
+                updateBackButton()
                 controller.getMessageById(tag.text.slice(1 until tag.text.length).toLong()) {
                     view!!.current_message.visibility = View.VISIBLE
                     view!!.message_short.text = it.text.replace("\n", " ").replace(Regex("[ ]+"), " ")
@@ -111,10 +137,14 @@ class MainChatFragment : Fragment() {
                             adapter!!.notifyDataSetChanged()
                         }
                         updateParentMessage()
+                        if (parentStack.empty())
+                            state = state xor State.MESSAGE
+                        updateBackButton()
                     }
                 }
             } else {
                 view!!.current_message.visibility = View.GONE
+                updateBackButton()
             }
         }
     }
@@ -136,7 +166,6 @@ class MainChatFragment : Fragment() {
         controller.addTag(Tag(123, "#-1", Tag.PARENT_TYPE)) {
             parentID = it
         }
-
 
         tagsRecycle = view.tags_search_recycler
         tagsCard = view.search_view
@@ -268,13 +297,40 @@ class MainChatFragment : Fragment() {
             }
         }
         (activity as MainActivity).onFragmentBackPressed = {
-            if(parentStack.isNotEmpty()) {
-                parentID = parentStack.pop()
-                updateMessageList(Controller(context!!), tagList) {
-                    adapter!!.notifyDataSetChanged()
+            when {
+                state and State.SEARCH > 0 -> changeSearchState()
+                state and State.BOOKMARK > 0 -> controller.addTag(Tag(123, "#bookmark", Tag.SYSTEM_TYPE)) {
+                    val mList = tagList.toMutableList()
+                    mList.remove(it)
+                    tagList = mList.toMutableSet()
+                    updateTagProvider(view!!, controller)
+                    updateMessageList(controller, mList) {
+                        adapter!!.notifyDataSetChanged()
+                    }
+                    state = state xor State.BOOKMARK
                 }
-                updateParentMessage()
+                state and State.MESSAGE_DETAILS > 0 -> {
+                    Navigation.findNavController(activity as MainActivity, R.id.fragment).navigateUp()
+                    state = state xor State.MESSAGE_DETAILS
+                }
+                state and State.MESSAGE > 0 -> {
+                    parentID = parentStack.pop()
+                    updateMessageList(Controller(context!!), tagList) {
+                        adapter!!.notifyDataSetChanged()
+                    }
+                    updateParentMessage()
+                    if (parentStack.empty())
+                        state = state xor State.MESSAGE
+                }
             }
+            updateBackButton()
+//            if(parentStack.isNotEmpty()) {
+//                parentID = parentStack.pop()
+//                updateMessageList(Controller(context!!), tagList) {
+//                    adapter!!.notifyDataSetChanged()
+//                }
+//                updateParentMessage()
+//            }
         }
 
         view.attach_button.setOnClickListener {
@@ -365,6 +421,7 @@ class MainChatFragment : Fragment() {
             val _id = it.tag.toString().toLong()
             val bundle = bundleOf("messageId" to _id)
             Navigation.findNavController(it).navigate(R.id.action_mainChatFragment_to_messageFragment, bundle)
+            state = state or State.MESSAGE_DETAILS
             changeSearchState()
         }
 
@@ -442,6 +499,8 @@ class MainChatFragment : Fragment() {
             controller.addTag(Tag(123, "#bookmark", Tag.SYSTEM_TYPE)) {
                 tagList.clear()
                 tagList.add(it)
+                state = state or State.BOOKMARK
+                updateBackButton()
                 updateTagProvider(view!!, Controller(context!!))
                 updateMessageList(controller, tagList) {
                     adapter!!.notifyDataSetChanged()
@@ -467,17 +526,21 @@ class MainChatFragment : Fragment() {
 
     private fun changeSearchState() {
         val status = when (searchVisible) {
-            true -> View.GONE
-            false -> View.VISIBLE
+            true -> {
+                state = state xor State.SEARCH
+                View.GONE
+            }
+            false -> {
+                state = state or State.SEARCH
+                View.VISIBLE
+            }
         }
+        updateBackButton()
         tagsCard.visibility = status
 
         searchVisible = !searchVisible
         if (searchVisible) {
             onSearchVisible()
         }
-    }
-    fun test() {
-        Log.d("DEBUG", "It Works")
     }
 }
