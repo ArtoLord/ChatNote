@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.os.Parcelable
 import android.text.Editable
 import android.text.TextWatcher
@@ -14,6 +15,7 @@ import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
@@ -50,6 +52,7 @@ import kotlinx.android.synthetic.main.tag_view.view.*
 import kotlinx.android.synthetic.main.tag_view.view.close_button
 import org.jetbrains.anko.bundleOf
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.OutputStream
 import java.net.URI
@@ -308,7 +311,7 @@ class MainChatFragment : Fragment() {
                 }
             }
             Intent.ACTION_SEND_MULTIPLE ->{
-                handleSendMultipleImages(int)
+                handleSendMultipleImages(int,view)
             }
         }
         activity!!.intent.action = ""
@@ -430,15 +433,13 @@ class MainChatFragment : Fragment() {
         (activity as MainActivity).onFragmentResult = { requestCode, resultCode, data ->
             if (requestCode == MainActivity.PIC_IMAGE_REQUEST) {
                 val uri = data!!.data
+                val path = loadFileByUri(uri)
                 Log.d("DEBUG#", uri.path)
                 val attach = Attachment(
                     123, Attachment.IMAGE_TYPE.toString(),
                     Klaxon().toJsonString(
                         Image(
-                            MainActivity.getRealPathFromUri(
-                                context!!,
-                                uri as Uri
-                            )!!
+                            path
                         )
                     ), 123
                 )
@@ -563,6 +564,12 @@ class MainChatFragment : Fragment() {
 
             }
         }
+        if (item.itemId == R.id.load_db) {
+            loadDB()
+        }
+        if (item.itemId == R.id.pick_db) {
+            pickDB()
+        }
         return super.onOptionsItemSelected(item)
     }
 
@@ -630,15 +637,17 @@ class MainChatFragment : Fragment() {
         }
     }
 
-    private fun handleSendMultipleImages(intent: Intent) {
+    private fun handleSendMultipleImages(intent: Intent, view:View) {
         intent.getParcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)?.let {
             for (i in it){
-                val uri = i as? URI
+                val uri = i as Uri
+                Log.d("LOGGING_URI", uri.path)
+                val path = loadFileByUri(uri)
                 val attach = Attachment(
                     123, Attachment.IMAGE_TYPE.toString(),
                     Klaxon().toJsonString(
                         Image(
-                            File(uri!!).path
+                            path
                         )
                     ), 123
                 )
@@ -662,5 +671,29 @@ class MainChatFragment : Fragment() {
         activity!!.getSharedPreferences(MainActivity.PREFERENCES, Context.MODE_PRIVATE).edit().putLong("last_image_id",_id+1).commit()
         return context!!.filesDir.path+"/$_id"
     }
+
+
+    fun loadDB(){
+        val inFileName = "/data/data/com.yshmgrt.chat/databases/MainDatabase"
+        val dbFile =  File(inFileName)
+        val fis =  FileInputStream(dbFile)
+        val outFileName = Environment.getExternalStorageDirectory().path+"/database_copy.db"
+        val output =  FileOutputStream(outFileName)
+        Toast.makeText(context!!,"Loaded to $outFileName",Toast.LENGTH_LONG).show()
+        fis.copyTo(output,1024)
+    }
+
+    fun pickDB(){
+        val inFileName = "/data/data/com.yshmgrt.chat/databases/MainDatabase"
+        val dbFile =  File(inFileName)
+        dbFile.delete()
+        File(inFileName).createNewFile()
+        val outFileName = Environment.getExternalStorageDirectory().path+"/database_copy.db"
+        val fis =  FileInputStream(outFileName)
+        val output =  FileOutputStream(inFileName)
+        fis.copyTo(output,1024)
+    }
+
+
 
 }

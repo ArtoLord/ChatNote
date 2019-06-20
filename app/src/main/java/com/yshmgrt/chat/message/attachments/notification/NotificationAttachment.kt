@@ -44,7 +44,9 @@ class NotificationAttachment(val attachment: Attachment) : IAttachment {
 
     private val notification = Klaxon().parse<Notification>(attachment.link)!!
 
-    override fun getMessageView(context : Context) = NotificationAttachmentView(context).apply { setContent(notification) }
+    override fun getMessageView(context : Context) = NotificationAttachmentView(context).apply {
+        setContent(notification)
+    }
 
     override fun getPreview(context : Context) = NotificationAttachmentView(context, true).apply { setContent(notification) }
 
