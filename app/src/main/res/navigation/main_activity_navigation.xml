@@ -6,28 +6,10 @@
 
     <fragment android:id="@+id/mainChatFragment" android:name="com.yshmgrt.chat.view.MainChatFragment"
               android:label="MainChatFragment">
-        <action android:id="@+id/action_mainChatFragment_to_notificationsFragment"
-                app:destination="@id/notificationsFragment" app:enterAnim="@anim/nav_default_enter_anim"
-                app:exitAnim="@anim/nav_default_exit_anim" app:popUpTo="@+id/mainChatFragment"/>
         <action android:id="@+id/action_mainChatFragment_to_messageFragment"
                 app:destination="@+id/messageFragment" app:enterAnim="@anim/nav_default_enter_anim"
                 app:exitAnim="@anim/nav_default_exit_anim" app:popUpTo="@+id/mainChatFragment"
         />
-        <action android:id="@+id/action_mainChatFragment_to_bookmarksFragment" app:destination="@id/bookmarksFragment"/>
-    </fragment>
-    <fragment android:id="@+id/notificationsFragment" android:name="com.yshmgrt.chat.view.NotificationsFragment"
-              android:label="NotificationsFragment">
-        <action android:id="@+id/action_notificationsFragment_to_mainChatFragment"
-                app:destination="@id/mainChatFragment" app:enterAnim="@anim/nav_default_enter_anim"
-                app:exitAnim="@anim/nav_default_exit_anim"/>
-        <action android:id="@+id/action_notificationsFragment_to_bookmarksFragment"
-                app:destination="@id/bookmarksFragment"/>
-    </fragment>
-    <fragment android:id="@+id/bookmarksFragment" android:name="com.yshmgrt.chat.view.BookmarksFragment"
-              android:label="BookmarksFragment">
-        <action android:id="@+id/action_bookmarksFragment_to_mainChatFragment" app:destination="@id/mainChatFragment"/>
-        <action android:id="@+id/action_bookmarksFragment_to_notificationsFragment"
-                app:destination="@id/notificationsFragment"/>
     </fragment>
 
     <fragment android:id="@+id/messageFragment"
