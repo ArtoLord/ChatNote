@@ -13,6 +13,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.yshmgrt.chat.MainActivity
 import com.yshmgrt.chat.R
+import com.yshmgrt.chat.SplashActivity
 import com.yshmgrt.chat.data_base.Controller
 import com.yshmgrt.chat.data_base.dataclasses.Message
 
@@ -28,10 +29,10 @@ class NotificationsBrodcast():BroadcastReceiver() {
     private fun sendNotif(context: Context, message: Message){
         Log.d("ChatNote", message._id.toString())
         val notificManage = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val intent = Intent(context, MainActivity::class.java)
+        val intent = Intent(context, SplashActivity::class.java)
         intent.action = MainActivity.NOTIFICATION_CLICKED.toString()
         intent.putExtra("messageId",message._id)
-        val pendingIntent = PendingIntent.getActivity(context, MainActivity.NOTIFICATION_CLICKED, intent,PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent = PendingIntent.getActivity(context, MainActivity.NOTIFICATION_CLICKED, intent,PendingIntent.FLAG_ONE_SHOT)
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

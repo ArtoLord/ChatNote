@@ -3,8 +3,11 @@ package com.yshmgrt.chat.view
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -15,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.navigation.NavigatorProvider
+import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beust.klaxon.Klaxon
@@ -34,15 +38,21 @@ import com.yshmgrt.chat.message.attachments.images.ImageAttachment
 import com.yshmgrt.chat.message.attachments.notification.Notification
 import com.yshmgrt.chat.message.attachments.notification.NotificationAttachment
 import com.yshmgrt.chat.message.logic.Logic
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.attachment_background_card.view.*
 import kotlinx.android.synthetic.main.bottom_drawer_fragment.view.*
 import kotlinx.android.synthetic.main.current_message_view.view.*
+import kotlinx.android.synthetic.main.main_chat_fragment.*
 import kotlinx.android.synthetic.main.main_chat_fragment.view.*
 import kotlinx.android.synthetic.main.search_fragment.*
 import kotlinx.android.synthetic.main.search_fragment.view.*
 import kotlinx.android.synthetic.main.tag_view.view.*
 import kotlinx.android.synthetic.main.tag_view.view.close_button
 import org.jetbrains.anko.bundleOf
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
+import java.net.URI
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -54,6 +64,7 @@ class MainChatFragment : Fragment() {
     var sendStats = true
     var editableMessageId = -1L
     val parentStack = Stack<Long>()
+    val attachmentList = mutableListOf<Attachment>()
 
     var adapter: MessageViewAdapter? = null
     private lateinit var linearLayoutManager: LinearLayoutManager
@@ -209,8 +220,6 @@ class MainChatFragment : Fragment() {
         linearLayoutManager.stackFromEnd = true
         view.message_list_1.layoutManager = linearLayoutManager
         view.message_list_1.adapter = adapter
-
-        val attachmentList = mutableListOf<Attachment>()
         view.send_button.setOnClickListener {
             if (sendStats) {
                 if (view.message_edit_text.text.isNotEmpty() || attachmentList.isNotEmpty()) {
@@ -279,6 +288,31 @@ class MainChatFragment : Fragment() {
             }
         }
 
+        val int = (activity as MainActivity).intent
+        when(int.action){
+            MainActivity.NOTIFICATION_CLICKED.toString()->{
+                val id = int!!.extras["messageId"].toString().toLong()
+                Log.d("ChatNote", id.toString())
+                val bundle = bundleOf("messageId" to id)
+                state = state or State.MESSAGE_DETAILS
+                updateBackButton()
+                Navigation.findNavController((activity as MainActivity).fragment.view!!).navigate(R.id.action_mainChatFragment_to_messageFragment,bundle)
+            }
+            Intent.ACTION_SEND->{
+                Log.d("URI_DEBUG",int.type)
+                if ("text/plain" == int.type) {
+                    handleSendText(int,view) // Handle text being sent
+                } else if (int.type?.startsWith("image/") == true) {
+                    Log.d("URI_DEBUG","OK")
+                    handleSendImage(int,view) // Handle single image being sent
+                }
+            }
+            Intent.ACTION_SEND_MULTIPLE ->{
+                handleSendMultipleImages(int)
+            }
+        }
+        activity!!.intent.action = ""
+
         (activity as MainActivity).onMessageUpdate = {
             sendStats = false
             editableMessageId = it
@@ -301,6 +335,10 @@ class MainChatFragment : Fragment() {
         (activity as MainActivity).onFragmentBackPressed = {
             Log.d("State1", state.toString())
             when {
+                state and State.MESSAGE_DETAILS > 0 -> {
+                    Navigation.findNavController(activity as MainActivity, R.id.fragment).navigateUp()
+                    state = state xor State.MESSAGE_DETAILS
+                }
                 state and State.SEARCH > 0 -> changeSearchState()
                 state and State.BOOKMARK > 0 -> controller.addTag(Tag(123, "#bookmark", Tag.SYSTEM_TYPE)) {
                     val mList = tagList.toMutableList()
@@ -311,10 +349,6 @@ class MainChatFragment : Fragment() {
                         adapter!!.notifyDataSetChanged()
                     }
                     state = state xor State.BOOKMARK
-                }
-                state and State.MESSAGE_DETAILS > 0 -> {
-                    Navigation.findNavController(activity as MainActivity, R.id.fragment).navigateUp()
-                    state = state xor State.MESSAGE_DETAILS
                 }
                 state and State.MESSAGE > 0 -> {
                     parentID = parentStack.pop()
@@ -396,6 +430,7 @@ class MainChatFragment : Fragment() {
         (activity as MainActivity).onFragmentResult = { requestCode, resultCode, data ->
             if (requestCode == MainActivity.PIC_IMAGE_REQUEST) {
                 val uri = data!!.data
+                Log.d("DEBUG#", uri.path)
                 val attach = Attachment(
                     123, Attachment.IMAGE_TYPE.toString(),
                     Klaxon().toJsonString(
@@ -403,7 +438,7 @@ class MainChatFragment : Fragment() {
                             MainActivity.getRealPathFromUri(
                                 context!!,
                                 uri as Uri
-                            )
+                            )!!
                         )
                     ), 123
                 )
@@ -566,4 +601,66 @@ class MainChatFragment : Fragment() {
             onSearchVisible()
         }
     }
+
+
+    private fun handleSendText(intent: Intent,view: View) {
+        intent.getStringExtra(Intent.EXTRA_TEXT)!!.let {
+            view.message_edit_text.setText(it)
+        }
+    }
+
+    private fun handleSendImage(intent: Intent, view: View) {
+        (intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let {uri->
+            val path = loadFileByUri(uri)
+            val attach = Attachment(
+                123, Attachment.IMAGE_TYPE.toString(),
+                Klaxon().toJsonString(
+                    Image(
+                        path
+                    )
+                ), 123
+            )
+            attachmentList.add(attach)
+            val v = AttachmentView(context!!, attach)
+            v.delete_attachment.setOnClickListener {
+                v.visibility = View.GONE
+                attachmentList.remove(attach)
+            }
+            view!!.attachments_view.addView(v)
+        }
+    }
+
+    private fun handleSendMultipleImages(intent: Intent) {
+        intent.getParcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)?.let {
+            for (i in it){
+                val uri = i as? URI
+                val attach = Attachment(
+                    123, Attachment.IMAGE_TYPE.toString(),
+                    Klaxon().toJsonString(
+                        Image(
+                            File(uri!!).path
+                        )
+                    ), 123
+                )
+                attachmentList.add(attach)
+                val v = AttachmentView(context!!, attach)
+                v.delete_attachment.setOnClickListener {
+                    v.visibility = View.GONE
+                    attachmentList.remove(attach)
+                }
+                view!!.attachments_view.addView(v)
+            }
+        }
+    }
+
+
+    fun loadFileByUri(uri:Uri):String{
+        val iStream = context!!.contentResolver.openInputStream(uri) //copyTo
+        val _id = activity!!.getSharedPreferences(MainActivity.PREFERENCES, Context.MODE_PRIVATE).getLong("last_image_id",0L)
+        val outStream = FileOutputStream(File(context!!.filesDir.path+"/$_id"))
+        iStream.copyTo(outStream)
+        activity!!.getSharedPreferences(MainActivity.PREFERENCES, Context.MODE_PRIVATE).edit().putLong("last_image_id",_id+1).commit()
+        return context!!.filesDir.path+"/$_id"
+    }
+
 }
