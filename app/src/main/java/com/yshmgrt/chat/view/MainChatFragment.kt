@@ -9,6 +9,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
+import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -456,12 +457,20 @@ class MainChatFragment : Fragment() {
             }
             if (requestCode == MainActivity.PIC_FILE_REQUEST) {
                 val uri = data!!.data!!
+                var name = ""
+                (activity as MainActivity)
+                    .contentResolver
+                    .query(uri, null, null, null, null)?.apply {
+                        if (moveToFirst())
+                            name = getString(getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                    }?.close()
+
                 val type = (context as MainActivity).contentResolver.getType(uri) ?: ""
                 Log.d("Filetest", uri.path ?: "")
                 val attach = Attachment(
                     123, Attachment.DOCUMENT_TYPE.toString(),
                     Klaxon().toJsonString(
-                        Document(loadFileByUri(uri), type)
+                        Document(loadFileByUri(uri), type, name)
                     ), 123
                 )
                 attachmentList.add(attach)

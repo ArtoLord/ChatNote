@@ -24,7 +24,7 @@ class DocumentAttachmentView(context: Context, isPreview: Boolean = false) : Lin
 
     fun setContent(document: Document) {
         val file = File(document.path)
-        findViewById<TextView>(R.id.file_name).text = "." + document.ext.split("/")[1]
+        findViewById<TextView>(R.id.file_name).text = document.name
         findViewById<TextView>(R.id.file_size).text = sizeToString(file.length())
 
         setOnClickListener {
