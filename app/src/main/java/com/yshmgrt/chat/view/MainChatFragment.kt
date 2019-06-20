@@ -3,7 +3,6 @@ package com.yshmgrt.chat.view
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -13,6 +12,7 @@ import android.os.Parcelable
 import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
@@ -21,8 +21,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
-import androidx.navigation.NavigatorProvider
-import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.beust.klaxon.Klaxon
@@ -46,7 +44,6 @@ import com.yshmgrt.chat.message.attachments.notification.NotificationAttachment
 import com.yshmgrt.chat.message.logic.Logic
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.attachment_background_card.view.*
-import kotlinx.android.synthetic.main.bottom_drawer_fragment.*
 import kotlinx.android.synthetic.main.bottom_drawer_fragment.view.*
 import kotlinx.android.synthetic.main.current_message_view.view.*
 import kotlinx.android.synthetic.main.main_chat_fragment.*
@@ -59,8 +56,6 @@ import org.jetbrains.anko.bundleOf
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.OutputStream
-import java.net.URI
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -79,6 +74,8 @@ class MainChatFragment : Fragment() {
     val messageList = mutableListOf<Long>()
 
     var state = State.NONE
+
+    lateinit var thisView:View
 
 
     private fun updateBackButton() {
@@ -181,7 +178,13 @@ class MainChatFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.main_chat_fragment, container, false)
+        view.message_edit_text.isVerticalScrollBarEnabled = true
+        view.message_edit_text.movementMethod = ScrollingMovementMethod()
+        view.to_end_action_button.setOnClickListener {
+            view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
+        }
         //tagList.addAll(systemTagList)
+        pickDB()
 
         val controller = Controller(context!!)
         if (parentID==-1L) controller.addTag(Tag(123,"#-1",Tag.PARENT_TYPE)){
@@ -217,7 +220,6 @@ class MainChatFragment : Fragment() {
                 updateMessageList(controller, tagList) {
                     adapter!!.notifyDataSetChanged()
                     view.message_edit_text.text.clear()
-                    view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
                 }
             }
             //val bundle = bundleOf("messageId" to _id)
@@ -280,7 +282,6 @@ class MainChatFragment : Fragment() {
                                 updateMessageList(controller) {
                                     adapter!!.notifyDataSetChanged()
                                     view.message_edit_text.text.clear()
-                                    view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
                                     attachmentList.clear()
                                     view.attachments_view.removeAllViews()
                                 }
@@ -434,7 +435,6 @@ class MainChatFragment : Fragment() {
         }
         updateMessageList(controller) {
             adapter!!.notifyDataSetChanged()
-            view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
         }
 
 
@@ -486,6 +486,7 @@ class MainChatFragment : Fragment() {
             }
         }
 
+        thisView = view
 
         return view
     }
@@ -597,12 +598,14 @@ class MainChatFragment : Fragment() {
 
             }
         }
+            /*
         if (item.itemId == R.id.load_db) {
             loadDB()
         }
         if (item.itemId == R.id.pick_db) {
             pickDB()
         }
+        */
         return super.onOptionsItemSelected(item)
     }
 
@@ -616,7 +619,16 @@ class MainChatFragment : Fragment() {
             date.set(Calendar.YEAR, year)
             date.set(Calendar.MONTH, monthOfYear)
             date.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            setInitialDateTime(date)
+            val temp = mutableListOf<Long>()
+            temp.addAll(tagList)
+            temp.add(parentID)
+            Controller(context!!).getMessageByTagsAndDate(temp,date.time.time){
+                val ind = messageList.indexOf(it)
+                if ( ind!=-1 ) thisView.message_list_1.smoothScrollToPosition(ind)
+                else{
+                    thisView.message_list_1.smoothScrollToPosition(messageList.size-1)
+                }
+            }
         }
 
     private fun changeSearchState() {
@@ -706,25 +718,30 @@ class MainChatFragment : Fragment() {
     }
 
 
+    /*
     fun loadDB(){
         val inFileName = "/data/data/com.yshmgrt.chat/databases/MainDatabase"
         val dbFile =  File(inFileName)
         val fis =  FileInputStream(dbFile)
-        val outFileName = Environment.getExternalStorageDirectory().path+"/database_copy.db"
+        val outFileName = Environment.getExternalStorageDirectory().path+"/defoult_db"
         val output =  FileOutputStream(outFileName)
         Toast.makeText(context!!,"Loaded to $outFileName",Toast.LENGTH_LONG).show()
         fis.copyTo(output,1024)
     }
+    */
 
     fun pickDB(){
-        val inFileName = "/data/data/com.yshmgrt.chat/databases/MainDatabase"
-        val dbFile =  File(inFileName)
-        dbFile.delete()
-        File(inFileName).createNewFile()
-        val outFileName = Environment.getExternalStorageDirectory().path+"/database_copy.db"
-        val fis =  FileInputStream(outFileName)
-        val output =  FileOutputStream(inFileName)
-        fis.copyTo(output,1024)
+        val ist = activity!!.getSharedPreferences(MainActivity.PREFERENCES, Context.MODE_PRIVATE).getBoolean("is_first",false)
+        if (!ist) {
+            val inFileName = "/data/data/com.yshmgrt.chat/databases/MainDatabase"
+            val dbFile = File(inFileName)
+            dbFile.delete()
+            File(inFileName).createNewFile()
+            val fis = context!!.assets.open("defoult_db")
+            val output = FileOutputStream(inFileName)
+            fis.copyTo(output, 1024)
+            activity!!.getSharedPreferences(MainActivity.PREFERENCES, Context.MODE_PRIVATE).edit().putBoolean("is_first",true).apply()
+        }
     }
 
 
