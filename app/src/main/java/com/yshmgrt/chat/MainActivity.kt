@@ -100,6 +100,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var onMessageDelete:()->Unit
     lateinit var onMessageUpdate:(Long)->Unit
     lateinit var onFragmentBackPressed:()->Unit
+    lateinit var moveToMessageDetails: () -> Unit
 
     override fun onBackPressed() {
         onFragmentBackPressed()

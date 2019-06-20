@@ -63,6 +63,7 @@ class MainChatFragment : Fragment() {
 
 
     private fun updateBackButton() {
+        Log.d("State1", state.toString())
         val toolbar = (activity as AppCompatActivity).supportActionBar!!
         if (state <= 1) {
             toolbar.setDisplayHomeAsUpEnabled(false)
@@ -298,6 +299,7 @@ class MainChatFragment : Fragment() {
             }
         }
         (activity as MainActivity).onFragmentBackPressed = {
+            Log.d("State1", state.toString())
             when {
                 state and State.SEARCH > 0 -> changeSearchState()
                 state and State.BOOKMARK > 0 -> controller.addTag(Tag(123, "#bookmark", Tag.SYSTEM_TYPE)) {
@@ -332,6 +334,10 @@ class MainChatFragment : Fragment() {
 //                }
 //                updateParentMessage()
 //            }
+        }
+        (activity as MainActivity).moveToMessageDetails = {
+            state = state or State.MESSAGE_DETAILS
+            updateBackButton()
         }
 
         view.attach_button.setOnClickListener {

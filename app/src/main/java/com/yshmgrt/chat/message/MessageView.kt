@@ -109,6 +109,7 @@ class MessageView constructor(
         val dialogActions = listOf({
             val bundle = bundleOf("messageId" to message._id)
             Navigation.findNavController(this).navigate(R.id.action_mainChatFragment_to_messageFragment,bundle)
+            (context as MainActivity).moveToMessageDetails()
         }, {
             (context as MainActivity).onMessageUpdate(message._id)
         }, {
