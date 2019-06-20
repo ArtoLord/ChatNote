@@ -15,7 +15,7 @@ import com.yshmgrt.chat.message.attachments.IAttachment
 
 class DocumentAttachment(val attachment: Attachment) : IAttachment {
 
-    private val document = Klaxon().parse<Document>(attachment.link) ?: Document("","")
+    private val document = Klaxon().parse<Document>(attachment.link) ?: Document("","", "")
 
     override fun getMessageView(context: Context) = DocumentAttachmentView(context).apply { setContent(document) }
 
