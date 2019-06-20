@@ -3,6 +3,7 @@ package com.yshmgrt.chat.view
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -35,6 +36,8 @@ import com.yshmgrt.chat.data_base.dataclasses.SQL_Message
 import com.yshmgrt.chat.data_base.dataclasses.Tag
 import com.yshmgrt.chat.message.TagView
 import com.yshmgrt.chat.message.attachments.AttachmentView
+import com.yshmgrt.chat.message.attachments.document.Document
+import com.yshmgrt.chat.message.attachments.document.DocumentAttachment
 import com.yshmgrt.chat.message.attachments.images.Image
 import com.yshmgrt.chat.message.attachments.images.ImageAttachment
 import com.yshmgrt.chat.message.attachments.notification.Notification
@@ -42,6 +45,7 @@ import com.yshmgrt.chat.message.attachments.notification.NotificationAttachment
 import com.yshmgrt.chat.message.logic.Logic
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.attachment_background_card.view.*
+import kotlinx.android.synthetic.main.bottom_drawer_fragment.*
 import kotlinx.android.synthetic.main.bottom_drawer_fragment.view.*
 import kotlinx.android.synthetic.main.current_message_view.view.*
 import kotlinx.android.synthetic.main.main_chat_fragment.*
@@ -416,6 +420,10 @@ class MainChatFragment : Fragment() {
                         today[Calendar.DAY_OF_MONTH]
                     ).show()
                 }
+                it.add_document.setOnClickListener {
+                    DocumentAttachment.sendIntentToPick(activity!! as MainActivity)
+                    (activity as MainActivity).closeDrawer()
+                }
             }
         }
 
@@ -433,14 +441,30 @@ class MainChatFragment : Fragment() {
         (activity as MainActivity).onFragmentResult = { requestCode, resultCode, data ->
             if (requestCode == MainActivity.PIC_IMAGE_REQUEST) {
                 val uri = data!!.data
-                val path = loadFileByUri(uri)
-                Log.d("DEBUG#", uri.path)
+                Log.d("Filetest", uri?.path ?: "")
+
                 val attach = Attachment(
                     123, Attachment.IMAGE_TYPE.toString(),
                     Klaxon().toJsonString(
-                        Image(
-                            path
-                        )
+                        Image(loadFileByUri(uri!!))
+                    ), 123
+                )
+                attachmentList.add(attach)
+                val v = AttachmentView(context!!, attach)
+                v.delete_attachment.setOnClickListener {
+                    v.visibility = View.GONE
+                    attachmentList.remove(attach)
+                }
+                view.attachments_view.addView(v)
+            }
+            if (requestCode == MainActivity.PIC_FILE_REQUEST) {
+                val uri = data!!.data!!
+                val type = (context as MainActivity).contentResolver.getType(uri) ?: ""
+                Log.d("Filetest", uri.path ?: "")
+                val attach = Attachment(
+                    123, Attachment.DOCUMENT_TYPE.toString(),
+                    Klaxon().toJsonString(
+                        Document(loadFileByUri(uri), type)
                     ), 123
                 )
                 attachmentList.add(attach)
@@ -667,8 +691,8 @@ class MainChatFragment : Fragment() {
         val iStream = context!!.contentResolver.openInputStream(uri) //copyTo
         val _id = activity!!.getSharedPreferences(MainActivity.PREFERENCES, Context.MODE_PRIVATE).getLong("last_image_id",0L)
         val outStream = FileOutputStream(File(context!!.filesDir.path+"/$_id"))
-        iStream.copyTo(outStream)
-        activity!!.getSharedPreferences(MainActivity.PREFERENCES, Context.MODE_PRIVATE).edit().putLong("last_image_id",_id+1).commit()
+        iStream?.copyTo(outStream)
+        activity!!.getSharedPreferences(MainActivity.PREFERENCES, Context.MODE_PRIVATE).edit().putLong("last_image_id",_id+1).apply()
         return context!!.filesDir.path+"/$_id"
     }
 

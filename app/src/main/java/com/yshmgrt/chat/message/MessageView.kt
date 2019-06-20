@@ -114,14 +114,14 @@ class MessageView constructor(
             (context as MainActivity).onMessageUpdate(message._id)
         }, {
             AlertDialog.Builder(context)
-                .setTitle("delete message")
-                .setMessage("Are you sure you want to delete this message?")
-                .setPositiveButton("Yes"){_,_->
+                .setTitle(R.string.want_to_delete_1)
+                .setMessage(R.string.want_to_delete_2)
+                .setPositiveButton(R.string.yes){_,_->
                     Controller(context).deleteMessageById(message._id) {
                         (context as MainActivity).onMessageDelete()
                     }
                 }
-                .setNegativeButton("No"){_,_->}
+                .setNegativeButton(R.string.no){_,_->}
                 .show()
 
         }, {

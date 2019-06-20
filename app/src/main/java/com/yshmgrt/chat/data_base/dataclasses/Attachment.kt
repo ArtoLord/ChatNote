@@ -5,5 +5,6 @@ class Attachment(val _id:Long,val type:String,val link:String,val parentId:Long)
         val IMAGE_TYPE = 0
         val EVENT_TYPE = 1
         val MESSAGE_TYPE = 2
+        val DOCUMENT_TYPE = 3
     }
 }
