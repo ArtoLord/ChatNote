@@ -10,10 +10,8 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -79,19 +77,18 @@ class MainActivity : AppCompatActivity() {
         val PERMISSION_REQUEST = 1
         val NOTIFICATION_CLICKED = 2
         val PICK_DATABASE = 3
+        val PIC_FILE_REQUEST = 4
         val CHANNEL_ID = "ChatNote"
         fun getRealPathFromUri(context: Context, contentUri: Uri): String {
             var cursor: Cursor? = null
             try {
                 val proj = arrayOf(MediaStore.Images.Media.DATA)
-                cursor = context.getContentResolver().query(contentUri, proj, null, null, null)
-                val column_index = cursor!!.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-                cursor!!.moveToFirst()
-                return cursor!!.getString(column_index)
+                cursor = context.contentResolver.query(contentUri, proj, null, null, null)
+                val columnIndex = cursor!!.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+                cursor.moveToFirst()
+                return cursor.getString(columnIndex)
             } finally {
-                if (cursor != null) {
-                    cursor!!.close()
-                }
+                cursor?.close()
             }
         }
     }

@@ -29,12 +29,15 @@ import com.yshmgrt.chat.data_base.dataclasses.SQL_Message
 import com.yshmgrt.chat.data_base.dataclasses.Tag
 import com.yshmgrt.chat.message.TagView
 import com.yshmgrt.chat.message.attachments.AttachmentView
+import com.yshmgrt.chat.message.attachments.document.Document
+import com.yshmgrt.chat.message.attachments.document.DocumentAttachment
 import com.yshmgrt.chat.message.attachments.images.Image
 import com.yshmgrt.chat.message.attachments.images.ImageAttachment
 import com.yshmgrt.chat.message.attachments.notification.Notification
 import com.yshmgrt.chat.message.attachments.notification.NotificationAttachment
 import com.yshmgrt.chat.message.logic.Logic
 import kotlinx.android.synthetic.main.attachment_background_card.view.*
+import kotlinx.android.synthetic.main.bottom_drawer_fragment.*
 import kotlinx.android.synthetic.main.bottom_drawer_fragment.view.*
 import kotlinx.android.synthetic.main.current_message_view.view.*
 import kotlinx.android.synthetic.main.main_chat_fragment.view.*
@@ -43,6 +46,7 @@ import kotlinx.android.synthetic.main.search_fragment.view.*
 import kotlinx.android.synthetic.main.tag_view.view.*
 import kotlinx.android.synthetic.main.tag_view.view.close_button
 import org.jetbrains.anko.bundleOf
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -379,6 +383,10 @@ class MainChatFragment : Fragment() {
                         today[Calendar.DAY_OF_MONTH]
                     ).show()
                 }
+                it.add_document.setOnClickListener {
+                    DocumentAttachment.sendIntentToPick(activity!! as MainActivity)
+                    (activity as MainActivity).closeDrawer()
+                }
             }
         }
 
@@ -396,6 +404,7 @@ class MainChatFragment : Fragment() {
         (activity as MainActivity).onFragmentResult = { requestCode, resultCode, data ->
             if (requestCode == MainActivity.PIC_IMAGE_REQUEST) {
                 val uri = data!!.data
+                Log.d("Filetest", uri?.path ?: "")
                 val attach = Attachment(
                     123, Attachment.IMAGE_TYPE.toString(),
                     Klaxon().toJsonString(
@@ -404,6 +413,25 @@ class MainChatFragment : Fragment() {
                                 context!!,
                                 uri as Uri
                             )
+                        )
+                    ), 123
+                )
+                attachmentList.add(attach)
+                val v = AttachmentView(context!!, attach)
+                v.delete_attachment.setOnClickListener {
+                    v.visibility = View.GONE
+                    attachmentList.remove(attach)
+                }
+                view.attachments_view.addView(v)
+            }
+            if (requestCode == MainActivity.PIC_FILE_REQUEST) {
+                val uri = data!!.data
+                Log.d("Filetest", uri?.path ?: "")
+                val attach = Attachment(
+                    123, Attachment.DOCUMENT_TYPE.toString(),
+                    Klaxon().toJsonString(
+                        Document(
+                            uri?.path ?: ""
                         )
                     ), 123
                 )
