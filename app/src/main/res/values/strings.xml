@@ -19,4 +19,8 @@
     <string name="from_bookmarks">Remove from bookmarks</string>
     <string name="get_messages_dump">Get messages dump</string>
     <string name="pick_messages_from_storage">Pick messages from storage</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="want_to_delete_1">delete message</string>
+    <string name="want_to_delete_2">Are you sure you want to delete this message?</string>
 </resources>
