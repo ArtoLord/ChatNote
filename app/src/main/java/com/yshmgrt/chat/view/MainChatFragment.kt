@@ -165,7 +165,7 @@ class MainChatFragment : Fragment() {
         //tagList.addAll(systemTagList)
 
         val controller = Controller(context!!)
-        controller.addTag(Tag(123, "#-1", Tag.PARENT_TYPE)) {
+        if (parentID==-1L) controller.addTag(Tag(123,"#-1",Tag.PARENT_TYPE)){
             parentID = it
         }
 
@@ -421,7 +421,18 @@ class MainChatFragment : Fragment() {
         return view
     }
 
-    fun onSearchVisible() {
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("RESUME","$parentID")
+        updateMessageList(Controller(context!!),tagList){
+            adapter!!.notifyDataSetChanged()
+        }
+        updateParentMessage()
+        updateTagProvider(view!!, Controller(context!!))
+
+    }
+    fun onSearchVisible(){
         val controller = Controller(context!!)
         val messageList = mutableListOf<Long>()
         val tagList = mutableListOf<Long>()
