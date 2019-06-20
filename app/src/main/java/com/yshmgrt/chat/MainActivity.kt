@@ -20,6 +20,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.bundleOf
 import android.provider.DocumentsContract
 import android.content.ContentUris
+import android.content.pm.ActivityInfo
 import android.os.Environment.getExternalStorageDirectory
 import android.os.Build
 import android.os.Environment
@@ -31,6 +32,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayShowHomeEnabled(true)
