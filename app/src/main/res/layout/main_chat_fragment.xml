@@ -125,6 +125,7 @@
                                                                            android:src="@drawable/ic_keyboard_arrow_down_white_24dp"
                                                                            android:backgroundTint="@color/surfaceDark"
                                                                            app:borderWidth="0dp"
+                                                                           app:fabSize="mini"
                                                                            android:layout_height="wrap_content"/>
 
     <include

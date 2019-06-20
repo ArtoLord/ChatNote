@@ -8,6 +8,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.os.Message
 import android.os.Parcelable
 import android.provider.OpenableColumns
 import android.text.Editable
@@ -33,6 +34,7 @@ import com.yshmgrt.chat.data_base.dataclasses.Attachment
 import com.yshmgrt.chat.data_base.dataclasses.Link
 import com.yshmgrt.chat.data_base.dataclasses.SQL_Message
 import com.yshmgrt.chat.data_base.dataclasses.Tag
+import com.yshmgrt.chat.message.MessageView
 import com.yshmgrt.chat.message.TagView
 import com.yshmgrt.chat.message.attachments.AttachmentView
 import com.yshmgrt.chat.message.attachments.document.Document
@@ -144,21 +146,9 @@ class MainChatFragment : Fragment() {
                 updateBackButton()
                 controller.getMessageById(tag.text.slice(1 until tag.text.length).toLong()) {
                     view!!.current_message.visibility = View.VISIBLE
-                    view!!.message_short.text = it.text.replace("\n", " ").replace(Regex("[ ]+"), " ")
-                    val c = GregorianCalendar()
-                    c.time = it.time
+                    view!!.message_short.text = it.text
                     val dateFormat = SimpleDateFormat("HH:mm")
-                    view!!.message_time.text = dateFormat.format(it.time)
-                    view!!.close_message_button.setOnClickListener {
-                        parentID = parentStack.pop()
-                        updateMessageList(Controller(context!!), tagList) {
-                            adapter!!.notifyDataSetChanged()
-                        }
-                        updateParentMessage()
-                        if (parentStack.empty())
-                            state = state xor State.MESSAGE
-                        updateBackButton()
-                    }
+                    view!!.current_message_time.text = dateFormat.format(it.time)
                 }
             } else {
                 view!!.current_message.visibility = View.GONE

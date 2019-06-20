@@ -146,5 +146,7 @@ class MessageView constructor(
             true
         }
     }
+
+
     class MessageViewHolder(val messageView: MessageView): RecyclerView.ViewHolder(messageView)
 }
