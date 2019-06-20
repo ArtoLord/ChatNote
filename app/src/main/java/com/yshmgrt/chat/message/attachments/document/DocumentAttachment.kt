@@ -15,7 +15,7 @@ import com.yshmgrt.chat.message.attachments.IAttachment
 
 class DocumentAttachment(val attachment: Attachment) : IAttachment {
 
-    private val document = Klaxon().parse<Document>(attachment.link) ?: Document("")
+    private val document = Klaxon().parse<Document>(attachment.link) ?: Document("","")
 
     override fun getMessageView(context: Context) = DocumentAttachmentView(context).apply { setContent(document) }
 
@@ -43,7 +43,7 @@ class DocumentAttachment(val attachment: Attachment) : IAttachment {
                     arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE),
                     MainActivity.PERMISSION_REQUEST)
             } else {
-                val intent = Intent(Intent.ACTION_PICK)
+                val intent = Intent(Intent.ACTION_GET_CONTENT)
                 intent.type = "*/*"
                 activity.startActivityForResult(intent, MainActivity.PIC_FILE_REQUEST)
             }

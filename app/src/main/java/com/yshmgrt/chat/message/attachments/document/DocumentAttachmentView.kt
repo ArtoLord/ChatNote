@@ -11,6 +11,7 @@ import java.net.URI
 import android.content.Intent
 import androidx.core.content.ContextCompat.startActivity
 import com.yshmgrt.chat.MainActivity
+import androidx.core.content.FileProvider
 
 
 class DocumentAttachmentView(context: Context, isPreview: Boolean = false) : LinearLayout(context) {
@@ -23,15 +24,38 @@ class DocumentAttachmentView(context: Context, isPreview: Boolean = false) : Lin
 
     fun setContent(document: Document) {
         val file = File(document.path)
-        findViewById<TextView>(R.id.file_name).text = file.name
-        findViewById<TextView>(R.id.file_size).text = file.length().toString()
+        findViewById<TextView>(R.id.file_name).text = "." + document.ext.split("/")[1]
+        findViewById<TextView>(R.id.file_size).text = sizeToString(file.length())
 
         setOnClickListener {
             val myIntent = Intent(Intent.ACTION_VIEW)
             myIntent.data = Uri.fromFile(file)
-            val j = Intent.createChooser(myIntent, "Choose an application to open with:")
-            (context as MainActivity).startActivity(j)
+            val apkURI = FileProvider.getUriForFile(
+                context,
+                context.applicationContext
+                    .packageName + ".provider", file
+            )
+            myIntent.setDataAndType(apkURI, document.ext)
+            myIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            (context as MainActivity).startActivity(myIntent)
         }
+    }
+
+    private fun sizeToString(size : Long) : String {
+        var a = size
+        if (a < 1024)
+            return "$a bytes"
+        a /= 1024
+        if (a < 1024)
+            return "$a KB"
+        a /= 1024
+        if (a < 1024)
+            return "$a MB"
+        a /= 1024
+        if (a < 1024)
+            return "$a GB"
+        a /= 1024
+        return "A lot of"
     }
 
 }

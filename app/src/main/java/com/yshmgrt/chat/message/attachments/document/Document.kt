@@ -1,3 +1,3 @@
 package com.yshmgrt.chat.message.attachments.document
 
-data class Document(val path : String)
+data class Document(val path : String, val ext : String)

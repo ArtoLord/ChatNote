@@ -18,6 +18,11 @@ import androidx.navigation.fragment.NavHostFragment
 import com.yshmgrt.chat.view.BottomDrawerFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.bundleOf
+import android.provider.DocumentsContract
+import android.content.ContentUris
+import android.os.Environment.getExternalStorageDirectory
+import android.os.Build
+import android.os.Environment
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,13 +39,6 @@ class MainActivity : AppCompatActivity() {
         val host = fragment as NavHostFragment
         navigationController = host.navController
 
-        if (intent.action== NOTIFICATION_CLICKED.toString()){
-            val id = intent!!.extras["messageId"].toString().toLong()
-            Log.d("ChatNote", id.toString())
-            val bundle = bundleOf("messageId" to id)
-
-            navigationController.navigate(R.id.action_mainChatFragment_to_messageFragment,bundle)
-        }
     }
 
     private var bottomNavDrawer = BottomDrawerFragment().apply { onCreated = {} }
@@ -78,19 +76,8 @@ class MainActivity : AppCompatActivity() {
         val NOTIFICATION_CLICKED = 2
         val PICK_DATABASE = 3
         val PIC_FILE_REQUEST = 4
+        val PREFERENCES = "ChatNotePref"
         val CHANNEL_ID = "ChatNote"
-        fun getRealPathFromUri(context: Context, contentUri: Uri): String {
-            var cursor: Cursor? = null
-            try {
-                val proj = arrayOf(MediaStore.Images.Media.DATA)
-                cursor = context.contentResolver.query(contentUri, proj, null, null, null)
-                val columnIndex = cursor!!.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-                cursor.moveToFirst()
-                return cursor.getString(columnIndex)
-            } finally {
-                cursor?.close()
-            }
-        }
     }
 
     lateinit var onFragmentResult:(Int,Int,Intent?)->Unit
@@ -99,11 +86,12 @@ class MainActivity : AppCompatActivity() {
     lateinit var onFragmentBackPressed:()->Unit
     lateinit var moveToMessageDetails: () -> Unit
 
+    fun resolvIntent(){
+
+    }
+
     override fun onBackPressed() {
         onFragmentBackPressed()
-    }
-    fun onBackFromOtherPressed(){
-        super.onBackPressed()
     }
 
 
