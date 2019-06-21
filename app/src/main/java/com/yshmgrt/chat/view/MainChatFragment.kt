@@ -317,8 +317,8 @@ class MainChatFragment : Fragment() {
             editableMessageId = it
             controller.getMessageById(it) { message ->
                 view.message_edit_text.setText(message.text)
+                attachmentList.clear()
                 for (i in message.attachment) {
-                    attachmentList.clear()
                     controller.getAttachmentById(i) { attachment ->
                         attachmentList.add(attachment)
                         val v = AttachmentView(context!!, attachment)
