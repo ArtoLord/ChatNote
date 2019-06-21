@@ -73,6 +73,40 @@ class Controller(private val ctx: Context):IController {
             }
     }
 
+
+    fun getMessageByTagsAndDate(tags:List<Long>,date:Long,onEnd:(Long)->Unit){
+            var messageList = mutableSetOf<Long>()
+            ctx.database.use {
+                select("Message","_id")
+                    .whereArgs("time > $date")
+                    .exec{
+                        val ret = parseList(object:MapRowParser<Long>{
+                            override fun parseRow(columns: Map<String, Any?>): Long {
+                                return columns["_id"].toString().toLong()
+                            }
+                        })
+                    messageList.addAll(ret)
+                    for (i in 0 until tags.size) {
+                        select("Link", "messageId")
+                            .whereArgs("tagId = ${tags[i]}")
+                            .exec {
+                                messageList = messageList.intersect(parseList(object :MapRowParser<Long>{
+                                    override fun parseRow(columns: Map<String, Any?>): Long {
+                                        return columns.getValue("messageId").toString().toLong()
+                                    }
+                                })).toMutableSet()
+                                if(i==tags.size-1){
+                                    if (messageList.size>0)
+                                        onEnd(messageList.sorted().toList()[0])
+                                    onEnd(-1L)
+                                }
+                            }
+                    }
+                }
+
+            }
+    }
+
     fun updateMessage(message: SQL_Message, tags:List<Tag>, attachments: List<Attachment>, context: Context, onEnd: (Long) -> Unit){
         ctx.database.use {
             select("Link")
@@ -137,7 +171,7 @@ class Controller(private val ctx: Context):IController {
                     "type" to message.type
                 )
                 onEnd(exit)
-                insert(
+                if (message.type==SQL_Message.USER_TYPE) insert(
                     Helper.VIRTUAL_MESSAGE_TABLE,
                     "text" to message.text,
                     "_id" to exit
@@ -327,16 +361,25 @@ class Controller(private val ctx: Context):IController {
 
     }
 
-    fun addLink(tag: Link){
+    fun addLink(tag: Link, onEnd: () -> Unit = {}){
             ctx.database.use {
                 insert(
                     "Link",
                     "messageId" to tag.messageId,
                     "tagId" to tag.tagId
                 )
+                onEnd()
             }
 
     }
+
+    fun deleteLink(tag : Link, onEnd: () -> Unit = {}) {
+        ctx.database.use {
+            delete("LINK", "(tagId = {tagId}) AND (messageId = {messageId})", "tagId" to tag.tagId, "messageId" to tag.messageId)
+            onEnd()
+        }
+    }
+
     fun updateMessage(message:SQL_Message){
         ctx.database.use {
             update(

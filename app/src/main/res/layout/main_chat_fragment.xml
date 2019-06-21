@@ -90,6 +90,8 @@
                 <EditText
                         android:id="@+id/message_edit_text"
                         android:layout_width="0dp"
+                        android:maxLines="5"
+                        android:textIsSelectable="true"
                         android:layout_height="wrap_content"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/send_button"
@@ -114,6 +116,17 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton android:layout_width="wrap_content"
+                                                                           app:layout_constraintStart_toStartOf="parent"
+                                                                           app:layout_constraintBottom_toTopOf="@id/message_card"
+                                                                           android:id="@+id/to_end_action_button"
+                                                                           android:layout_margin="32dp"
+                                                                           android:src="@drawable/ic_keyboard_arrow_down_white_24dp"
+                                                                           android:backgroundTint="@color/surfaceDark"
+                                                                           app:borderWidth="0dp"
+                                                                           app:fabSize="mini"
+                                                                           android:layout_height="wrap_content"/>
 
     <include
             layout="@layout/search_fragment"

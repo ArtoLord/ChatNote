@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.yshmgrt.chat.R
 import com.yshmgrt.chat.data_base.Controller
+import com.yshmgrt.chat.data_base.dataclasses.SQL_Message
 import kotlinx.android.synthetic.main.message_search_row.view.*
 import kotlinx.android.synthetic.main.message_search_row.view.message_text
 import java.text.SimpleDateFormat
@@ -24,13 +25,13 @@ class MessageRowAdapter(val messages:List<Long>,val onClick:(View)->Unit): Recyc
         val controller = Controller(holder.itemView.context)
         val id = messages[position]
         controller.getMessageById(id){
-            holder.itemView.tag = id
-            holder.itemView.message_text.text = it.text.replace("\n"," ").replace(Regex("[ ]+")," ")
-            val c = GregorianCalendar()
-            c.time = it.time
-            val dateFormat = SimpleDateFormat("d MMMM yyyy, HH:mm")
-            holder.itemView.message_time.text = dateFormat.format(c.time)
-            holder.itemView.setOnClickListener(onClick)
+                holder.itemView.tag = id
+                holder.itemView.message_text.text = it.text.replace("\n", " ").replace(Regex("[ ]+"), " ")
+                val c = GregorianCalendar()
+                c.time = it.time
+                val dateFormat = SimpleDateFormat("d MMMM yyyy, HH:mm")
+                holder.itemView.message_time.text = dateFormat.format(c.time)
+                holder.itemView.setOnClickListener(onClick)
         }
     }
 }

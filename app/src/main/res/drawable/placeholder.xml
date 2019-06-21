@@ -7,8 +7,8 @@
     android:color="@color/background"
     />
     <size
-    android:height="600dp"
-    android:width="400dp"
+    android:height="300dp"
+    android:width="600dp"
     />
 
 </shape>
