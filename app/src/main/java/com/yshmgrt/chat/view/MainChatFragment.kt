@@ -17,6 +17,7 @@ import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import android.widget.AbsListView
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -174,7 +175,6 @@ class MainChatFragment : Fragment() {
             view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
         }
         //tagList.addAll(systemTagList)
-        pickDB()
 
         val controller = Controller(context!!)
         if (parentID==-1L) controller.addTag(Tag(123,"#-1",Tag.PARENT_TYPE)){
@@ -216,10 +216,22 @@ class MainChatFragment : Fragment() {
 
             //Navigation.findNavController(view).navigate(R.id.action_mainChatFragment_to_messageFragment,bundle)
         }
+
         linearLayoutManager = LinearLayoutManager(context!!.applicationContext)
         linearLayoutManager.stackFromEnd = true
         view.message_list_1.layoutManager = linearLayoutManager
         view.message_list_1.adapter = adapter
+        view.message_list_1.addOnScrollListener(object : RecyclerView.OnScrollListener(){
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if(dy<20 || recyclerView.computeVerticalScrollOffset()<200){
+                    view.to_end_action_button.hide()
+                }
+                else{
+                    view.to_end_action_button.show()
+                }
+                super.onScrolled(recyclerView, dx, dy)
+            }
+        })
         view.send_button.setOnClickListener {
             if (sendStats) {
                 if (view.message_edit_text.text.isNotEmpty() || attachmentList.isNotEmpty()) {
@@ -477,6 +489,7 @@ class MainChatFragment : Fragment() {
         }
 
         thisView = view
+        pickDB()
 
         return view
     }
