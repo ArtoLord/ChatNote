@@ -489,8 +489,7 @@ class MainChatFragment : Fragment() {
         }
 
         thisView = view
-        pickDB()
-
+        //pickDB()
         return view
     }
 
