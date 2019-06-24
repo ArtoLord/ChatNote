@@ -169,8 +169,10 @@ class MainChatFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.main_chat_fragment, container, false)
-        view.message_edit_text.isVerticalScrollBarEnabled = true
-        view.message_edit_text.movementMethod = ScrollingMovementMethod()
+        if (android.os.Build.VERSION.SDK_INT >= 24) {
+            view.message_edit_text.isVerticalScrollBarEnabled = true
+            view.message_edit_text.movementMethod = ScrollingMovementMethod()
+        }
         view.to_end_action_button.setOnClickListener {
             view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
         }

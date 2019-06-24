@@ -91,7 +91,6 @@
                         android:id="@+id/message_edit_text"
                         android:layout_width="0dp"
                         android:maxLines="5"
-                        android:textIsSelectable="true"
                         android:layout_height="wrap_content"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/send_button"
