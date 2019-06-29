@@ -192,7 +192,6 @@ class MainChatFragment : Fragment() {
             updateTagProvider(view, controller)
             updateMessageList(controller, tagList) {
                 adapter!!.notifyDataSetChanged()
-                view.message_edit_text.text.clear()
                 view.message_list_1.smoothScrollToPosition(adapter!!.itemCount - 1)
             }
         }) {
