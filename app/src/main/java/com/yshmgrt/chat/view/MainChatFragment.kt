@@ -210,7 +210,6 @@ class MainChatFragment : Fragment() {
                 updateTagProvider(view, controller)
                 updateMessageList(controller, tagList) {
                     adapter!!.notifyDataSetChanged()
-                    view.message_edit_text.text.clear()
                 }
             }
             //val bundle = bundleOf("messageId" to _id)
